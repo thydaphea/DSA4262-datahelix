@@ -1,5 +1,6 @@
 """Standardize assignment JSONL and labels with deterministic output and provenance."""
 import argparse
+from contextlib import contextmanager
 import csv
 import gzip
 import hashlib
@@ -103,6 +104,28 @@ def cleaned_input_paths(clean_dir=None, data=None, labels=None, require_labels=F
     data_path = verified_cleaned_file(directory, 'data.json.gz')
     label_path = verified_cleaned_file(directory, 'labels.csv') if require_labels else None
     return data_path, label_path
+
+
+
+@contextmanager
+def model_inputs(clean_dir=None, data=None, labels=None, require_labels=False):
+    """Accept raw assignment inputs or audited cleaned inputs for the two entry points."""
+    audited = data is not None and Path(data).name == 'data.json.gz' and (Path(data).parent/'audit.json').is_file()
+    if clean_dir is not None or audited:
+        signal_path, label_path = cleaned_input_paths(clean_dir, data, labels, require_labels)
+        yield signal_path, label_path, json.loads((signal_path.parent/'audit.json').read_text())
+        return
+    if data is None:
+        raise ValueError('Supply --data with raw JSON/JSON.gz, or --clean-dir')
+    if require_labels and labels is None:
+        raise ValueError('Training on raw JSON requires --labels')
+    # Keep preprocessing internal; classmates need not run a third script.
+    with tempfile.TemporaryDirectory(prefix='m6a-input-') as temporary:
+        directory = Path(temporary)/'cleaned'
+        run(argparse.Namespace(data=data, labels=labels, out_dir=str(directory),
+                               label_mode='fractional-binary', min_reads=1, unlabeled='keep'))
+        signal_path, label_path = cleaned_input_paths(directory, require_labels=require_labels)
+        yield signal_path, label_path, json.loads((directory/'audit.json').read_text())
 
 
 def cleaned_sites(path):

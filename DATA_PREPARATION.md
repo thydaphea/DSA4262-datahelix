@@ -1,3 +1,8 @@
+> For the assignment interface, `train.py --data-files dataset0.json.gz dataset1.json.gz dataset2.json.gz --label-files LABEL0 LABEL1 LABEL2`
+> and `predict.py --data RAW_JSON --model MODEL --output predictions.csv`
+> now run this cleaner internally. The commands below are optional when you
+> want persistent cleaned artifacts and a standalone cleaning audit.
+
 # Reproducible parsing and cleaning
 
 `clean_data.py` is the standalone preprocessing entry point. It contains the raw JSON parser and the cleaned-data loader used by training
@@ -21,7 +26,8 @@ source .venv311/bin/activate
 python -m pip install -r requirements.txt
 ```
 
-Cleaning requires NumPy and Python's standard library; PyTorch is not required.
+The combined `requirements.txt` installs the full pipeline, including CPU PyTorch.
+Cleaning itself uses only NumPy and Python's standard library.
 The standalone cleaner no longer imports `features.py`. Use the same source version,
 Python, NumPy, and compression-library version when comparing output hashes.
 
@@ -60,7 +66,7 @@ conversion, or `--label-mode binary` to require that input labels are already 0/
 Raw source files are never changed. With no label file, only signals are cleaned.
 Dataset2 evaluation uses the binary `label` for all 1,323 sites (1,134 positive,
 189 negative), and groups score summaries by `modification_fraction`.
-Training on dataset2 would still require gene annotations; none are invented.
+Training automatically groups matching dataset2 positions across mixture conditions; gene annotations are not invented.
 
 For inference data with no labels:
 
@@ -138,16 +144,13 @@ absolute input paths, so moving inputs changes the audit even if their content
 hashes match. Reordering source records can also change output ordering/hashes.
 Input hashes are checked again before publishing to detect concurrent changes.
 
-Run the regression checks:
+Verify the retained model's held-out evaluation and prediction/label hashes:
 
 ```bash
-python check_cleaning.py
+python evaluate_unified.py --results-root results/mlp
 ```
 
-Checks use temporary fixtures, deleted when finished. They verify repeat-run
-byte identity, plain/gzip equivalence, coordinate and feature preservation,
-fractional-label handling, explicit filtering, duplicate rejection, and failure
-without overwriting existing output. No demo data or demo models are retained.
+This checks the saved checkpoint, group separation, prediction coverage, and per-dataset and pooled test metrics.
 
 To repeat an actual run, choose a different output directory and compare the
 `output_sha256` entries in both audit files.
@@ -155,8 +158,8 @@ To repeat an actual run, choose a different output directory and compare the
 ## Use with training and prediction
 
 ```bash
-python train.py --model-type gb --clean-dir data/cleaned/dataset0 --out-dir results/gb_from_cleaned
-python predict.py --clean-dir data/cleaned/dataset1 --model results/gb/model.joblib --output results/dataset1/gb_cleaned_predictions.csv
+python train.py --clean-dirs data/cleaned/dataset0 data/cleaned/dataset1 data/cleaned/dataset2 --out-dir results/mlp_new
+python predict.py --clean-dir data/cleaned/dataset1 --model results/mlp/model.joblib --output dataset1_predictions.csv
 ```
 
 Training still requires binary labels and `gene_id` for gene-separated splitting.
@@ -177,17 +180,23 @@ All sites matched their own labels. No sites or reads were excluded under the
 default rules. Dataset2 retains all 945 fractional labels. No models were
 retrained and no existing predictions were changed.
 
-## Cleaned inputs are required by the model pipeline
+## Raw inputs and persistent cleaned inputs
 
-Use `--clean-dir` with a completed cleaning directory. Training loads `labels.csv`
-and `data.json.gz` from that directory; prediction needs only the cleaned signals
-and audit. Both verify SHA-256 hashes and reject raw/modified files with a clear
-message. All JSON reading is implemented in `clean_data.py`: `raw_sites()` for
-cleaning and `cleaned_sites()` for reading its canonical output. The latter does
-not repeat sequence normalization or filtering. JSON serialization still requires
-reading JSON at model runtime; the parsing code is centralized in the cleaner.
+The two assignment entry points accept raw files directly:
 
-Training retains model-specific target/gene checks. Evaluation now also reads
-cleaned labels for both dataset1 and dataset2. Already generated cleaned files
-remain compatible; their audit records correctly describe the producer version
-used at creation rather than being relabeled as outputs of a newer version.
+```bash
+python train.py --data-files data/dataset0.json.gz data/dataset1.json.gz data/dataset2.json.gz --label-files data/data.info.labelled data/dataset1.info data/dataset2.info --out-dir results/mlp_new
+python predict.py --data data/dataset1.json.gz --model results/mlp/model.joblib --output predictions.csv
+```
+
+They use `clean_data.py` internally to create temporary standardized inputs and
+remove those temporary files on completion or failure. Training saves the
+preprocessing audit in its report. Prediction needs no labels.
+
+For persistent cleaned artifacts, use the standalone commands above and pass
+`--clean-dirs data/cleaned/dataset0 data/cleaned/dataset1 data/cleaned/dataset2` to training, or `--clean-dir data/cleaned/<dataset>` to prediction. Audited canonical
+`data.json.gz` files are also accepted through `--data`; they are verified and
+read without cleaning again. Modified audited files fail hash verification.
+All JSON parsing remains centralized in `clean_data.py`. `features.py` constructs
+numeric features and does not clean or parse files. Existing saved models and
+cleaned data remain compatible with both interfaces.
