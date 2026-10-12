@@ -1,0 +1,61 @@
+{
+  "cleaner_version": "1.0.0",
+  "code_sha256": {
+    "clean_data.py": "67794c62ce0ae07dd3892cdfcecf8c13a6bd2d5994f2a31081420f4c080e58d6",
+    "features.py": "b5113709efdd0b355bf97e5c316d5e04ef813826e605c6c2c3f3b7d13fa35525"
+  },
+  "counts": {
+    "below_min_reads": 0,
+    "dropped_unlabeled_sites": 0,
+    "input_reads": 11027106,
+    "input_sites": 121838,
+    "labels_without_signal": 0,
+    "output_fractional_labels": 0,
+    "output_labeled_sites": 121838,
+    "output_reads": 11027106,
+    "output_sites": 121838,
+    "unlabeled_sites": 0
+  },
+  "dropped_label_columns": [],
+  "environment": {
+    "numpy": "1.26.4",
+    "python": "3.11.16",
+    "zlib": "1.3.2"
+  },
+  "inputs": {
+    "data": {
+      "path": "/home/ubuntu/project/data/dataset0.json.gz",
+      "sha256": "622410b2918692b75a880b753f1a621e8d892d6dbc13c1f430babc5543a0584e"
+    },
+    "labels": {
+      "path": "/home/ubuntu/project/data/data.info.labelled",
+      "sha256": "6758f002db36835c188c9d6fb039b4599494ca9dcc816c26cc22a2c04ee42978"
+    }
+  },
+  "options": {
+    "label_mode": "binary",
+    "min_reads": 1,
+    "unlabeled": "keep"
+  },
+  "output_label_counts": {
+    "0": 116363,
+    "1": 5475
+  },
+  "output_sha256": {
+    "data.json.gz": "fca8979e37cb6b5325cfe59da7f81639ab5677cf78286a14e82b287cfcde0ac6",
+    "exclusions.csv": "6b2c49fc4f776d919aadb44d90d40feda4931990ff9522c7e92a00718ae198a7",
+    "labels.csv": "a81558a342787d381fc6f1edff31c8fad73755ae73b5623050d8cb4dc0a7ed9d",
+    "site_manifest.csv": "959ab500febbf60ceee952db3905a191a408dd2a71fd477735de84c1fe7e2a4e"
+  },
+  "rules": [
+    "Input order and coordinate strings are preserved; no coordinate conversion or ID suffix stripping.",
+    "Blank lines are skipped; sequence is uppercased and U converted to T.",
+    "Malformed records, duplicate sites, invalid labels, and nonfinite signals stop the run.",
+    "Dwell times and signal SDs must be nonnegative; no current-intensity cutoff is applied.",
+    "No imputation, outlier removal, signal scaling, or read subsampling is performed.",
+    "n_reads is recomputed from JSON and checked against supplied label counts.",
+    "Fractional labels are preserved only with explicit fractional mode, never thresholded.",
+    "start/end index fields are not copied; rewritten JSON invalidates original offsets.",
+    "No cross-dataset coordinate filtering is applied."
+  ]
+}

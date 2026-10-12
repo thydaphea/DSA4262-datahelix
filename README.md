@@ -21,8 +21,9 @@ Older separate-dataset models and their results have been removed. The shared ML
 | `features.py` | Build pooled signal and sequence features. |
 | `neural.py` | Define neural networks, training, and inference routines. |
 | `metrics.py` | Calculate trapezoidal PR-AUC. |
+| `benchmark_m6anet.py` | Run official pretrained HCT116_RNA002 m6Anet on the existing test sites and compare all four methods. |
 
-Only the seven Python files listed above are retained. Obsolete separate-model scripts, duplicate entry points, and optional check/benchmark scripts have been removed.
+The eight Python files listed above support the current workflow and pretrained benchmark. Obsolete separate-model scripts, duplicate entry points, and optional check/benchmark scripts have been removed.
 
 ## What each model learns from
 
@@ -174,3 +175,83 @@ These settings were selected using each model’s own pooled validation PR-AUC.
 | GB | 0.479539 | `{"max_leaf_nodes":63,"max_iter":600,"learning_rate":0.03,"l2_regularization":1.0,"min_samples_leaf":10}` |
 | MLP | 0.492715 | `{"network_config":{"hidden":[256,128],"dropout":0.5},"learning_rate":0.001,"weight_decay":0.0001,"batch_size":256,"class_weight":"none"}` |
 | MIL | 0.413224 | `{"network_config":{"width":32,"attention_width":8,"dropout":0.3},"learning_rate":0.003,"weight_decay":0.0001,"batch_size":256,"class_weight":"none"}` |
+
+## Benchmark against pretrained m6Anet (HCT116_RNA002)
+
+`benchmark_m6anet.py` evaluates the official `HCT116_RNA002` option (the official name; there is no `HCT115_RNA002` option) on the **same 41,697 held-out sites** used for GB, MLP, and MIL. There is no training or fine-tuning. The pretrained model is user-selected; sample chemistry has not been independently checked against sequencing metadata. Any overlap between these samples and the published model's training data is unknown; the sites are guaranteed held out from our project models only. This is a pretrained-tool benchmark, not a comparison of architectures trained on identical examples or with equal tuning budgets.
+
+The official implementation is pinned to commit `590ec277cb48d61774f0872395099e466022e810`. It declares historical Python/PyTorch dependencies; the adapter runs the unchanged source using this project's Python 3.11/PyTorch 2.6 environment, with an explicit compatibility check against the official input loader. Extra support packages are isolated under `.tools/m6anet-deps/`.
+
+To prepare a fresh checkout (skip cloning if the directory already exists):
+
+```bash
+git clone https://github.com/GoekeLab/m6anet.git .tools/m6anet-source
+git -C .tools/m6anet-source checkout 590ec277cb48d61774f0872395099e466022e810
+.tools/uv pip install --python .venv311/bin/python --target .tools/m6anet-deps --no-deps toml==0.10.2 tqdm==4.67.1 ujson==5.10.0 setuptools==75.8.0
+```
+
+Run the compatibility check and benchmark:
+
+```bash
+source .venv311/bin/activate
+python benchmark_m6anet.py --check-only
+python benchmark_m6anet.py --pretrained-model HCT116_RNA002 --out-dir results/m6anet_rna002
+```
+
+Use a new output directory for repeat runs. If `uv` is installed elsewhere, replace `.tools/uv` with its executable path. The normal training/prediction environment is not modified by the isolated support-package installation.
+
+The adapter streams the cleaned nine-column measurements, applies the official pretrained k-mer normalization and embedding, and calls the official read encoder and site-probability calculation. No measurement columns are dropped. It tests equivalence with the official indexed loader using temporary bookkeeping read IDs; those IDs are not model features or recovered biological read identities. All test sites pass the default 20-read minimum and supported motif checks. If future test data do not meet those requirements, the script stops rather than silently comparing different sites.
+
+For this pinned source, **the official HCT116_RNA002 option uses `rna002_hct116.pt` weights and `rna002_hct116.joblib` normalization**. We preserve that pairing exactly; we do not estimate normalization from the test data. The source configuration can be inspected in [m6Anet constants](https://github.com/GoekeLab/m6anet/blob/590ec277cb48d61774f0872395099e466022e810/m6anet/utils/constants.py).
+
+Each score averages the official noisy-OR probability over 1,000 bootstrap samples of 20 reads, sampled with replacement. A reproducible seed is derived separately for each dataset/site. This serial seeding scheme avoids dependence on multiprocessing scheduling; numerical scores may differ slightly from an unseeded/default CLI run. We compare **site modification probability**, not `mod_ratio` or per-read probabilities.
+
+Outputs in `results/m6anet_rna002/`:
+
+- `benchmark_metrics.csv`: 16 rows comparing all four methods, per dataset and pooled, on identical test sites; includes trapezoidal PR-AUC, AP, and ROC-AUC.
+- `evaluation_metrics.csv`: the four pretrained m6Anet metric rows.
+- `evaluation/`: three test-only prediction CSVs, pooled test predictions, and dataset provenance.
+- `test_manifest.csv`: the exact evaluated sites and labels.
+- `pretrained_model.pt`, `normalization.joblib`, `model_config.toml`: the official pretrained assets used.
+- `benchmark_audit.json`: source commit, asset/input hashes, settings, compatibility checks, and limitations.
+
+The existing `results/evaluation_metrics.csv` remains the three-model comparison. No existing model or prediction file is overwritten. These m6Anet outputs cover **test sites only** and are not full-dataset assignment submission files.
+
+Observed pooled test metrics for the pretrained RNA002 benchmark (41,697 sites):
+
+| Method | Trapezoidal PR-AUC | ROC-AUC |
+|---|---:|---:|
+| GB | 0.4937 | 0.8893 |
+| MLP | 0.5071 | 0.8892 |
+| Attention MIL | 0.4348 | 0.8739 |
+| Pretrained m6Anet HCT116_RNA002 | 0.4278 | 0.8703 |
+
+These results describe transfer of the specified pretrained weights to these samples. Chemistry/domain compatibility and original training-set overlap remain unverified; they do not establish an architecture-only performance ranking. See [the full benchmark table](results/m6anet_rna002/benchmark_metrics.csv) for per-dataset results and [the audit](results/m6anet_rna002/benchmark_audit.json) for provenance.
+
+
+## Controlled MLP positive-weight comparison
+
+To test moderate positive-class training-loss weights while keeping the selected MLP configuration fixed:
+
+```bash
+python train.py --model-type mlp --clean-dirs data/cleaned/dataset0 data/cleaned/dataset1 data/cleaned/dataset2 --mlp-positive-weights 1 2 3 5 --out-dir results/mlp_weight_comparison
+```
+
+This mode takes the architecture, optimizer settings, batch size, seed, thread count, maximum epochs, early-stopping patience, and exact partitions from the saved baseline in `results/mlp/`. It changes only the positive multiplier in `BCEWithLogitsLoss`; it does not run the broader hyperparameter search. Other training-setting flags do not override those baseline settings in this comparison mode. Use a new output directory to repeat the experiment.
+
+Weight 1 reuses and verifies the existing unweighted checkpoint. Weights 2, 3, and 5 train new models with the same 256→128 hidden layers, dropout 0.5, learning rate 0.001, batch size 256, AdamW decay 0.0001, seed 42, maximum 30 epochs, and patience six. Training-only standardization is identical across variants. Each new checkpoint and the preferred weight are selected by **unweighted pooled validation PR-AUC**, before new test metrics are computed.
+
+`results/mlp_weight_comparison/evaluation_metrics.csv` contains 16 rows: dataset0, dataset1, dataset2, and pooled for each weight. It includes PR-AUC, AP, ROC-AUC, Brier score, and precision/recall at 0.5. `selection.json` records the validation-selected weight, fixed settings, model hashes, and limitations. The common `split_manifest.csv` records every site's partition. Each `weight_*/evaluation/` directory contains held-out predictions; weights greater than 1 also retain their models and validation histories. The weight-1 model remains at `results/mlp/model.joblib`.
+
+These are **training-loss weights, not test weights**. Validation/test metrics use every site's natural contribution. Weighting can change probability calibration and the behaviour of a 0.5 cutoff. This single-seed experiment measures conditional effects for the current configuration; it does not establish statistical significance. Existing models, submissions, and comparison tables are not replaced.
+
+Completed moderate-weight comparison on 41,697 pooled test sites:
+
+| Positive training weight | Validation PR-AUC | Test PR-AUC | Test ROC-AUC |
+|---|---:|---:|---:|
+| 1 (unweighted) | 0.4927 | 0.5071 | 0.8892 |
+| 2 | 0.4893 | 0.5030 | 0.8885 |
+| 3 | 0.4887 | 0.5038 | 0.8890 |
+| 5 | 0.4877 | 0.5031 | 0.8881 |
+
+The unweighted baseline remains selected by validation PR-AUC. Moderate weighting increased recall at a 0.5 threshold but reduced precision and did not improve PR-AUC in this run. See [all per-dataset and pooled weighting results](results/mlp_weight_comparison/evaluation_metrics.csv). The existing final MLP remains unchanged.

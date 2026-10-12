@@ -1,0 +1,22 @@
+{
+  "model_path": "/home/ubuntu/project/results/mil/model.joblib",
+  "model_sha256": "83ab9e3de329f99b24ef472103ede43572e2e31c3dfc1ab812ebe5c486bd9aab",
+  "files": {
+    "dataset0_predictions.csv": {
+      "n_sites": 121838,
+      "sha256": "d42b30fc5336f954ed97110dde9b6b91d90bf47007afd739d93fe94619012cb4",
+      "input_sha256": "fca8979e37cb6b5325cfe59da7f81639ab5677cf78286a14e82b287cfcde0ac6"
+    },
+    "dataset1_predictions.csv": {
+      "n_sites": 90810,
+      "sha256": "7178c28ded3495ebd1e69e02a56de80c81034d523ce31bb0b098148ce8ee8981",
+      "input_sha256": "318b2527af89b1bf2a3ef48d65bf591b17def7f41dc224474dfab97dcef453b3"
+    },
+    "dataset2_predictions.csv": {
+      "n_sites": 1323,
+      "sha256": "22389c09c06d41048989068eb7cd792f26d465ef3264fabc65a9176f59348bed",
+      "input_sha256": "ddb6a8328bb2b697fad94c8dff8fb3134bf033e7467e7a285fba27d2188b369d"
+    }
+  },
+  "note": "One unchanged model generates every file. Full files include training/validation/test rows; evaluate only test rows from split_manifest.csv."
+}

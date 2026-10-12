@@ -1,0 +1,273 @@
+{
+  "protocol": "Controlled MLP training-loss weighting comparison; fixed baseline settings and partitions.",
+  "settings": {
+    "clean_dirs": [
+      "data/cleaned/dataset0",
+      "data/cleaned/dataset1",
+      "data/cleaned/dataset2"
+    ],
+    "data_files": null,
+    "label_files": null,
+    "model_type": "mlp",
+    "out_dir": "results/mlp_weight_comparison/weight_5",
+    "max_reads": 64,
+    "epochs": 30,
+    "patience": 6,
+    "batch_size": 256,
+    "learning_rate": 0.001,
+    "threads": 1,
+    "folds": 5,
+    "seed": 42,
+    "class_weight": "none",
+    "selection_metric": "pr_auc",
+    "positive_weight": 5.0
+  },
+  "model_selection": {
+    "metric": "pooled_validation_pr_auc",
+    "best_score": 0.4876499788981714,
+    "best_epoch": 16,
+    "epochs_run": 22,
+    "best_params": {
+      "network_config": {
+        "hidden": [
+          256,
+          128
+        ],
+        "dropout": 0.5
+      },
+      "learning_rate": 0.001,
+      "weight_decay": 0.0001,
+      "batch_size": 256,
+      "class_weight": "custom",
+      "positive_weight": 5.0
+    }
+  },
+  "preprocessing": {
+    "dataset0": {
+      "cleaner_version": "1.0.0",
+      "code_sha256": {
+        "clean_data.py": "67794c62ce0ae07dd3892cdfcecf8c13a6bd2d5994f2a31081420f4c080e58d6",
+        "features.py": "b5113709efdd0b355bf97e5c316d5e04ef813826e605c6c2c3f3b7d13fa35525"
+      },
+      "counts": {
+        "below_min_reads": 0,
+        "dropped_unlabeled_sites": 0,
+        "input_reads": 11027106,
+        "input_sites": 121838,
+        "labels_without_signal": 0,
+        "output_fractional_labels": 0,
+        "output_labeled_sites": 121838,
+        "output_reads": 11027106,
+        "output_sites": 121838,
+        "unlabeled_sites": 0
+      },
+      "dropped_label_columns": [],
+      "environment": {
+        "numpy": "1.26.4",
+        "python": "3.11.16",
+        "zlib": "1.3.2"
+      },
+      "inputs": {
+        "data": {
+          "path": "/home/ubuntu/project/data/dataset0.json.gz",
+          "sha256": "622410b2918692b75a880b753f1a621e8d892d6dbc13c1f430babc5543a0584e"
+        },
+        "labels": {
+          "path": "/home/ubuntu/project/data/data.info.labelled",
+          "sha256": "6758f002db36835c188c9d6fb039b4599494ca9dcc816c26cc22a2c04ee42978"
+        }
+      },
+      "options": {
+        "label_mode": "binary",
+        "min_reads": 1,
+        "unlabeled": "keep"
+      },
+      "output_label_counts": {
+        "0": 116363,
+        "1": 5475
+      },
+      "output_sha256": {
+        "data.json.gz": "fca8979e37cb6b5325cfe59da7f81639ab5677cf78286a14e82b287cfcde0ac6",
+        "exclusions.csv": "6b2c49fc4f776d919aadb44d90d40feda4931990ff9522c7e92a00718ae198a7",
+        "labels.csv": "a81558a342787d381fc6f1edff31c8fad73755ae73b5623050d8cb4dc0a7ed9d",
+        "site_manifest.csv": "959ab500febbf60ceee952db3905a191a408dd2a71fd477735de84c1fe7e2a4e"
+      },
+      "rules": [
+        "Input order and coordinate strings are preserved; no coordinate conversion or ID suffix stripping.",
+        "Blank lines are skipped; sequence is uppercased and U converted to T.",
+        "Malformed records, duplicate sites, invalid labels, and nonfinite signals stop the run.",
+        "Dwell times and signal SDs must be nonnegative; no current-intensity cutoff is applied.",
+        "No imputation, outlier removal, signal scaling, or read subsampling is performed.",
+        "n_reads is recomputed from JSON and checked against supplied label counts.",
+        "Fractional labels are preserved only with explicit fractional mode, never thresholded.",
+        "start/end index fields are not copied; rewritten JSON invalidates original offsets.",
+        "No cross-dataset coordinate filtering is applied."
+      ]
+    },
+    "dataset1": {
+      "cleaner_version": "1.0.0",
+      "code_sha256": {
+        "clean_data.py": "67794c62ce0ae07dd3892cdfcecf8c13a6bd2d5994f2a31081420f4c080e58d6",
+        "features.py": "b5113709efdd0b355bf97e5c316d5e04ef813826e605c6c2c3f3b7d13fa35525"
+      },
+      "counts": {
+        "below_min_reads": 0,
+        "dropped_unlabeled_sites": 0,
+        "input_reads": 7907952,
+        "input_sites": 90810,
+        "labels_without_signal": 0,
+        "output_fractional_labels": 0,
+        "output_labeled_sites": 90810,
+        "output_reads": 7907952,
+        "output_sites": 90810,
+        "unlabeled_sites": 0
+      },
+      "dropped_label_columns": [
+        "start",
+        "end"
+      ],
+      "environment": {
+        "numpy": "1.26.4",
+        "python": "3.11.16",
+        "zlib": "1.3.2"
+      },
+      "inputs": {
+        "data": {
+          "path": "/home/ubuntu/project/data/dataset1.json.gz",
+          "sha256": "5e88520aa2ea8b83dee626d290934dd81672a92e5b04ecb7dbd828b65659a6ef"
+        },
+        "labels": {
+          "path": "/home/ubuntu/project/data/dataset1.info",
+          "sha256": "05c8441c4d60a6228f79d219bb7240921699495f23052b378cdda432417acaf3"
+        }
+      },
+      "options": {
+        "label_mode": "binary",
+        "min_reads": 1,
+        "unlabeled": "keep"
+      },
+      "output_label_counts": {
+        "0": 84217,
+        "1": 6593
+      },
+      "output_sha256": {
+        "data.json.gz": "318b2527af89b1bf2a3ef48d65bf591b17def7f41dc224474dfab97dcef453b3",
+        "exclusions.csv": "6b2c49fc4f776d919aadb44d90d40feda4931990ff9522c7e92a00718ae198a7",
+        "labels.csv": "b1f47cb9f00aedf1aed66b4adc520bf9107bf53951d160117c152524bc129146",
+        "site_manifest.csv": "113f4b9ebc9ac61fb31f7ea9ef3854419e15dc1b3417756958c7f9ebeebae683"
+      },
+      "rules": [
+        "Input order and coordinate strings are preserved; no coordinate conversion or ID suffix stripping.",
+        "Blank lines are skipped; sequence is uppercased and U converted to T.",
+        "Malformed records, duplicate sites, invalid labels, and nonfinite signals stop the run.",
+        "Dwell times and signal SDs must be nonnegative; no current-intensity cutoff is applied.",
+        "No imputation, outlier removal, signal scaling, or read subsampling is performed.",
+        "n_reads is recomputed from JSON and checked against supplied label counts.",
+        "Fractional labels are preserved only with explicit fractional mode, never thresholded.",
+        "start/end index fields are not copied; rewritten JSON invalidates original offsets.",
+        "No cross-dataset coordinate filtering is applied."
+      ]
+    },
+    "dataset2": {
+      "binary_label_counts": {
+        "0": 189,
+        "1": 1134
+      },
+      "binary_label_rule": "label = int(modification_fraction > 0)",
+      "cleaner_version": "2.1.0",
+      "code_sha256": {
+        "clean_data.py": "6863cd1c13ce175c813f0be86f493f108c6bfdc8399439e1c60fa6a628231a86"
+      },
+      "counts": {
+        "below_min_reads": 0,
+        "dropped_unlabeled_sites": 0,
+        "input_reads": 1171940,
+        "input_sites": 1323,
+        "labels_without_signal": 0,
+        "output_fractional_labels": 0,
+        "output_labeled_sites": 1323,
+        "output_reads": 1171940,
+        "output_sites": 1323,
+        "retained_fractional_source_labels": 945,
+        "unlabeled_sites": 0
+      },
+      "dropped_label_columns": [
+        "start",
+        "end"
+      ],
+      "environment": {
+        "numpy": "1.26.4",
+        "python": "3.11.16",
+        "zlib": "1.3.2"
+      },
+      "inputs": {
+        "data": {
+          "path": "/home/ubuntu/project/data/dataset2.json.gz",
+          "sha256": "8bb7b21a2936efc6b26b1f18513748f0dcd47dfd932d03c4ac8c084ab9f8a288"
+        },
+        "labels": {
+          "path": "/home/ubuntu/project/data/dataset2.info",
+          "sha256": "e33fc70755a5045ddc2c143b69760849261ee616888d2e2369e2a94b89bebd71"
+        }
+      },
+      "options": {
+        "label_mode": "fractional-binary",
+        "min_reads": 1,
+        "unlabeled": "keep"
+      },
+      "output_label_counts": {
+        "0": 189,
+        "1": 1134
+      },
+      "output_sha256": {
+        "data.json.gz": "ddb6a8328bb2b697fad94c8dff8fb3134bf033e7467e7a285fba27d2188b369d",
+        "exclusions.csv": "6b2c49fc4f776d919aadb44d90d40feda4931990ff9522c7e92a00718ae198a7",
+        "labels.csv": "f35a80cf804c1eecb1cace1ffd0e4e13c01ec51f7add0de3dfa39841bff6c1ed",
+        "site_manifest.csv": "a276f92e4c1394b77867e05184184af7f683621d85b5798d636a0317181458b3"
+      },
+      "rules": [
+        "Input order and coordinate strings are preserved; no coordinate conversion or ID suffix stripping.",
+        "Blank lines are skipped; sequence is uppercased and U converted to T.",
+        "Malformed records, duplicate sites, invalid labels, and nonfinite signals stop the run.",
+        "Dwell times and signal SDs must be nonnegative; no current-intensity cutoff is applied.",
+        "No imputation, outlier removal, signal scaling, or read subsampling is performed.",
+        "n_reads is recomputed from JSON and checked against supplied label counts.",
+        "Fractional mode preserves label; fractional-binary sets label = int(modification_fraction > 0) and retains the source fraction in modification_fraction.",
+        "start/end index fields are not copied; rewritten JSON invalidates original offsets.",
+        "No cross-dataset coordinate filtering is applied."
+      ]
+    }
+  },
+  "json_sites": {
+    "dataset0": 121838,
+    "dataset1": 90810,
+    "dataset2": 1323
+  },
+  "supplied_labelled_sites": 213971,
+  "training_sites": 138819,
+  "validation_sites": 33455,
+  "test_sites": 41697,
+  "training_sites_by_dataset": {
+    "dataset0": 78296,
+    "dataset1": 59746,
+    "dataset2": 777
+  },
+  "supplied_sites_by_dataset": {
+    "dataset0": 121838,
+    "dataset1": 90810,
+    "dataset2": 1323
+  },
+  "training_positives": 8436,
+  "class_weight": "custom",
+  "positive_weight": 5.0,
+  "grouping": "Global gene IDs and transcript fallbacks across dataset0/1; matching dataset2 mixture positions kept together.",
+  "heldout_metrics_model": "The saved model.joblib is the exact checkpoint used for held-out evaluation; no all-data refit.",
+  "limitations": [
+    "Dataset2 grouping assumes same position/sequence represents the same underlying site; gene/read provenance is unknown.",
+    "Dataset0/1 transcript-to-gene mappings assume compatible reference annotation.",
+    "Unweighted pooling and pooled validation PR-AUC are dominated by larger datasets.",
+    "Previously explored datasets make the evaluation exploratory.",
+    "Full submission files include training, validation, and test sites; evaluation metrics use test sites only."
+  ],
+  "baseline_model_sha256": "8c31c5715b620e26bd775018e54b3d537ed66c426cc69c3bd9f4626390501385"
+}

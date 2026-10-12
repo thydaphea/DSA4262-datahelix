@@ -1,0 +1,103 @@
+{
+  "settings": {
+    "source": ".tools/m6anet-source",
+    "support_dir": ".tools/m6anet-deps",
+    "clean_root": "data/cleaned",
+    "results_root": "results",
+    "pretrained_model": "HCT116_RNA002",
+    "out_dir": "results/m6anet_rna002",
+    "iterations": 1000,
+    "seed": 42,
+    "threads": 1,
+    "check_only": false
+  },
+  "source_commit": "590ec277cb48d61774f0872395099e466022e810",
+  "pretrained_model": "HCT116_RNA002",
+  "model_config": {
+    "model": "prod_sigmoid_pooling",
+    "block": [
+      {
+        "block_type": "DeaggregateNanopolish",
+        "num_neighboring_features": 1
+      },
+      {
+        "block_type": "KmerMultipleEmbedding",
+        "input_channel": 66,
+        "output_channel": 2,
+        "num_neighboring_features": 1
+      },
+      {
+        "block_type": "ConcatenateFeatures"
+      },
+      {
+        "block_type": "Linear",
+        "input_channel": 15,
+        "output_channel": 150,
+        "activation": "relu",
+        "batch_norm": true
+      },
+      {
+        "block_type": "Linear",
+        "input_channel": 150,
+        "output_channel": 32,
+        "activation": "relu",
+        "batch_norm": false
+      },
+      {
+        "block_type": "SigmoidProdPooling",
+        "input_channel": 32,
+        "n_reads_per_site": 20
+      }
+    ]
+  },
+  "weights_path": "/home/ubuntu/project/.tools/m6anet-source/m6anet/model/model_states/rna002_hct116.pt",
+  "weights_sha256": "61017b5e856063a5ef165eb024975bedca57c17ab9242a094a04dd65b38873dd",
+  "norm_path": "/home/ubuntu/project/.tools/m6anet-source/m6anet/model/norm_factors/rna002_hct116.joblib",
+  "norm_sha256": "e9d2060167c226f954c71a98727062839519f10d948e109e01931d58cd15e48c",
+  "config_path": "/home/ubuntu/project/.tools/m6anet-source/m6anet/model/configs/model_configs/m6anet.toml",
+  "config_sha256": "85af00732acf3e0e66a24f29426f1497dee4ada6be4bf95a0836725614cc225d",
+  "read_probability_threshold": 0.033379376,
+  "normalization_note": "Official HCT116_RNA002 configuration uses the bundled rna002_hct116.joblib normalization. No normalization is fitted on evaluation data.",
+  "torch_version": "2.6.0+cpu",
+  "numpy_version": "1.26.4",
+  "input_hashes": {
+    "dataset0": {
+      "data.json.gz": "fca8979e37cb6b5325cfe59da7f81639ab5677cf78286a14e82b287cfcde0ac6",
+      "labels.csv": "a81558a342787d381fc6f1edff31c8fad73755ae73b5623050d8cb4dc0a7ed9d"
+    },
+    "dataset1": {
+      "data.json.gz": "318b2527af89b1bf2a3ef48d65bf591b17def7f41dc224474dfab97dcef453b3",
+      "labels.csv": "b1f47cb9f00aedf1aed66b4adc520bf9107bf53951d160117c152524bc129146"
+    },
+    "dataset2": {
+      "data.json.gz": "ddb6a8328bb2b697fad94c8dff8fb3134bf033e7467e7a285fba27d2188b369d",
+      "labels.csv": "f35a80cf804c1eecb1cace1ffd0e4e13c01ec51f7add0de3dfa39841bff6c1ed"
+    }
+  },
+  "manifest_sha256": "057ecc094f84a412b642e803a9636ee3da1e1b03ca9b2b1375c034ee2bc7baac",
+  "comparator_model_hashes": {
+    "gb": "3c6544aa2ead34a93d4e9dd7a27cf8abca5f24d3dfb69436ef1dd27b586b47cc",
+    "mlp": "8c31c5715b620e26bd775018e54b3d537ed66c426cc69c3bd9f4626390501385",
+    "mil": "83ab9e3de329f99b24ef472103ede43572e2e31c3dfc1ab812ebe5c486bd9aab"
+  },
+  "prediction_hashes": {
+    "dataset0": "817b3f67a40d544937434c6c5d7b02b3fbb00aa0cf5b79799a35c48a78839b2f",
+    "dataset1": "3e0289aa1754c02d5d415f8d3563558f8c5987de8baa2d2f2aaddf59bbf0c00b",
+    "dataset2": "80078fbbdcb6c6a07eab1d62deab0c4661e245436aa6f0bacfc4dcc9c1fee6f8"
+  },
+  "test_sites": 41697,
+  "training_performed": false,
+  "score": "Official site probability: mean noisy-OR over 1000 bootstrap samples of 20 reads; not mod_ratio.",
+  "sampling": "Official _calculate_site_proba called serially with a reproducible per-dataset/site seed; independent of processing order.",
+  "checks": [
+    "Adapter matches official NanopolishDS tensors and read probabilities exactly.",
+    "All four methods evaluated on identical test coordinates and labels.",
+    "Every test site meets default m6Anet coverage/motif requirements."
+  ],
+  "limitations": [
+    "HCT116_RNA002 was selected by user request; sample chemistry has not been verified from sequencing metadata.",
+    "Overlap with pretrained m6Anet training data is unknown; these sites are only guaranteed held out from the project models.",
+    "Official model code executed with project PyTorch 2.6/Python 3.11, outside upstream historical package pins; adapter compatibility checked.",
+    "This benchmarks pretrained weights, not a matched-training or equally tuned architecture comparison."
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "model_path": "/home/ubuntu/project/results/mlp/model.joblib",
+  "model_sha256": "8c31c5715b620e26bd775018e54b3d537ed66c426cc69c3bd9f4626390501385",
+  "files": {
+    "dataset0_predictions.csv": {
+      "n_sites": 121838,
+      "sha256": "1de48b71c0c33cab503e60b2464bb49dedecb8df1e78a8087d1fa3e830796951",
+      "input_sha256": "fca8979e37cb6b5325cfe59da7f81639ab5677cf78286a14e82b287cfcde0ac6"
+    },
+    "dataset1_predictions.csv": {
+      "n_sites": 90810,
+      "sha256": "579776edb1651830f15977aa36e9db9ee39e421c96b29802b6ccabd8e700a365",
+      "input_sha256": "318b2527af89b1bf2a3ef48d65bf591b17def7f41dc224474dfab97dcef453b3"
+    },
+    "dataset2_predictions.csv": {
+      "n_sites": 1323,
+      "sha256": "21c0cb8a40b53ccffadca4a424a215fb4d8012101921f83de16d26d1f48f5a82",
+      "input_sha256": "ddb6a8328bb2b697fad94c8dff8fb3134bf033e7467e7a285fba27d2188b369d"
+    }
+  },
+  "note": "One unchanged model generates every file. Full files include training/validation/test rows; evaluate only test rows from split_manifest.csv."
+}

@@ -269,6 +269,119 @@ def train_unified(args):
         print('Saved one final model:',out/'model.joblib',flush=True)
 
 
+def compare_mlp_weights(args):
+    """Vary positive loss weight only; reuse the selected MLP and exact saved splits."""
+    import copy
+    import torch
+    from neural import train_network, probabilities, restore
+    from metrics import score_metrics
+    from clean_data import cleaned_input_paths
+    baseline_dir=Path(args.baseline_dir)
+    baseline_path=baseline_dir/'model.joblib'
+    baseline=joblib.load(baseline_path)
+    reference=baseline['report']
+    if baseline['kind']!='mlp' or reference['positive_weight']!=1.:
+        raise ValueError('Expected an unweighted MLP baseline')
+    weights=args.mlp_positive_weights
+    if len(set(weights))!=len(weights) or not all(np.isfinite(w) and w>=1 for w in weights):
+        raise ValueError('Positive weights must be unique finite values >= 1')
+    if 1. not in weights: weights=[1.]+weights
+    weights=sorted(weights)
+    out=Path(args.out_dir)
+    if out.exists(): raise FileExistsError(f'Choose a new output directory: {out}')
+    manifest_path=baseline_dir/'split_manifest.csv'
+    table=pd.read_csv(manifest_path,dtype={k:str for k in KEY})
+    if table.duplicated(['dataset']+KEY).any() or table.groupby('group_id').split.nunique().max()!=1:
+        raise ValueError('Invalid baseline partitions')
+    fit=np.flatnonzero(table.split.eq('train'));validation=np.flatnonzero(table.split.eq('validation'));test=np.flatnonzero(table.split.eq('test'))
+    y=table.label.astype(int).to_numpy()
+    directories={Path(path).name:Path(path) for path in args.clean_dirs}
+    if set(directories)!={'dataset0','dataset1','dataset2'}: raise ValueError('Supply all three cleaned dataset directories')
+    lookup={key:i for i,key in enumerate(table[['dataset']+KEY].itertuples(index=False,name=None))}
+    X=np.empty((len(table),74),dtype=np.float32);seen=np.zeros(len(table),dtype=bool)
+    for dataset,clean in sorted(directories.items()):
+        data_path,label_path=cleaned_input_paths(clean,require_labels=True)
+        for name,path in [('data.json.gz',data_path),('labels.csv',label_path)]:
+            if sha256(path)!=reference['preprocessing'][dataset]['output_sha256'][name]:
+                raise ValueError('Input differs from the original MLP training data')
+        count=0
+        for key,motif,reads in cleaned_sites(data_path):
+            index=lookup.get((dataset,*key))
+            if index is not None:
+                if seen[index]: raise ValueError('Repeated site')
+                X[index]=pooled_features(motif,reads);seen[index]=True
+            count+=1
+            if count%25000==0:print(f'{dataset}: prepared {count:,} sites',flush=True)
+    if not seen.all(): raise ValueError('Missing baseline sites')
+    arrays=(X,)
+    params=reference['model_selection']['best_params']
+    config=copy.deepcopy(baseline.get('network_config',params['network_config']))
+    seed=reference['settings']['seed'];epochs=reference['settings']['epochs'];patience=reference['settings']['patience']
+    threads=reference['settings']['threads'];batch_size=params['batch_size']
+    torch.set_num_threads(threads)
+    baseline_hash=sha256(baseline_path)
+    base_scores=probabilities(restore(baseline),'mlp',arrays,validation,baseline['mean'],baseline['scale'],batch_size)
+    base_value=pr_auc_score(y[validation],base_scores)
+    if not np.isclose(base_value,reference['model_selection']['best_score'],rtol=1e-7,atol=1e-8):
+        raise ValueError('Baseline validation predictions do not reproduce saved score')
+    out.mkdir(parents=True)
+    table.to_csv(out/'split_manifest.csv',index=False)
+    selections=[dict(positive_weight=1.,validation_pr_auc=base_value,best_epoch=baseline['best_epoch'],model_path=str(baseline_path.resolve()),model_sha256=baseline_hash,baseline_reused=True)]
+    for weight in weights:
+        if weight==1.:continue
+        folder=out/f'weight_{weight:g}';folder.mkdir()
+        print(f'Fixed MLP configuration; training positive_weight={weight:g}',flush=True)
+        model,mean,scale,history,epoch=train_network('mlp',arrays,y,fit,validation,seed,epochs,batch_size,
+            weight,'pr_auc',params['learning_rate'],patience,config,params['weight_decay'])
+        np.testing.assert_array_equal(mean,baseline['mean']);np.testing.assert_array_equal(scale,baseline['scale'])
+        value=max(row['validation_pr_auc'] for row in history)
+        report=copy.deepcopy(reference)
+        report['protocol']='Controlled MLP training-loss weighting comparison; fixed baseline settings and partitions.'
+        report['settings']['out_dir']=str(folder);report['settings']['positive_weight']=weight
+        report['class_weight']='custom';report['positive_weight']=weight
+        selected_params=copy.deepcopy(params);selected_params.update(class_weight='custom',positive_weight=weight)
+        report['model_selection']=dict(metric='pooled_validation_pr_auc',best_score=value,best_epoch=epoch,epochs_run=len(history),best_params=selected_params)
+        report['baseline_model_sha256']=baseline_hash
+        artifact=dict(kind='mlp',schema=SCHEMA,seed=seed,max_reads=baseline.get('max_reads',64),network_config=config,
+            state={k:v.detach().cpu().numpy() for k,v in model.state_dict().items()},mean=mean,scale=scale,
+            best_epoch=epoch,torch_version=str(torch.__version__),report=report)
+        joblib.dump(artifact,folder/'model.joblib')
+        (folder/'metrics.json').write_text(json.dumps(report,indent=2)+'\n')
+        (folder/'validation_history.json').write_text(json.dumps(history,indent=2)+'\n')
+        selections.append(dict(positive_weight=weight,validation_pr_auc=value,best_epoch=epoch,
+            model_path=str((folder/'model.joblib').resolve()),model_sha256=sha256(folder/'model.joblib'),baseline_reused=False))
+    # Freeze the winner using validation before computing any new test metrics.
+    winner=max(selections,key=lambda row:row['validation_pr_auc'])
+    selection=dict(selection_metric='pooled_validation_pr_auc',selected_positive_weight=winner['positive_weight'],
+        configurations=selections,fixed_parameters=params,seed=seed,epochs=epochs,patience=patience,threads=threads,
+        baseline_model_sha256=baseline_hash,manifest_sha256=sha256(manifest_path),
+        note='Only training loss is weighted. All validation/test metrics are unweighted. Original models are unchanged.',
+        limitations=['One random seed; differences do not establish statistical significance.','The test set has been inspected previously; results are exploratory.','Weights change probability calibration; a 0.5 threshold need not have the same meaning across variants.'])
+    (out/'selection.json').write_text(json.dumps(selection,indent=2)+'\n')
+    metrics=[]
+    for row in selections:
+        weight=row['positive_weight'];artifact=joblib.load(row['model_path'])
+        scores=probabilities(restore(artifact),'mlp',arrays,test,artifact['mean'],artifact['scale'],batch_size)
+        frame=table.iloc[test].copy();frame['score']=scores
+        directory=out/f'weight_{weight:g}'/'evaluation';directory.mkdir(parents=True,exist_ok=True)
+        for dataset in ('dataset0','dataset1','dataset2','pooled'):
+            part=frame if dataset=='pooled' else frame.loc[frame.dataset.eq(dataset)]
+            if weight==1. and dataset!='pooled':
+                saved=pd.read_csv(baseline_dir/'evaluation'/f'{dataset}_heldout_predictions.csv',dtype={k:str for k in KEY})
+                pd.testing.assert_frame_equal(part[KEY].reset_index(drop=True),saved[KEY])
+                np.testing.assert_allclose(part.score,saved.score,rtol=1e-5,atol=1e-6)
+            metrics.append(dict(model='shared_mlp',positive_weight=weight,dataset=dataset,evaluation='heldout_test',
+                validation_pr_auc=row['validation_pr_auc'],best_epoch=row['best_epoch'],
+                selected_by_validation=weight==winner['positive_weight'],**score_metrics(part)))
+            part[KEY+['score']].to_csv(directory/f'{dataset}_heldout_predictions.csv',index=False)
+        frame[['dataset']+KEY].to_csv(directory/'pooled_provenance.csv',index=False)
+    results=pd.DataFrame(metrics)
+    results.to_csv(out/'evaluation_metrics.csv',index=False)
+    if sha256(baseline_path)!=baseline_hash: raise ValueError('Baseline model changed during comparison')
+    print(results.loc[results.dataset.eq('pooled')].to_string(index=False))
+    print('Saved separate weighting comparison:',out,flush=True)
+
+
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     inputs=p.add_mutually_exclusive_group(required=True)
@@ -276,6 +389,8 @@ def main():
     inputs.add_argument('--data-files',nargs='+',help='Raw dataset0/1/2 JSON or JSON.gz files')
     p.add_argument('--label-files',nargs='+',help='Matching labels in the same order as --data-files')
     p.add_argument('--model-type',choices=['gb','mlp','mil'],default='mlp')
+    p.add_argument('--mlp-positive-weights',nargs='+',type=float,help='Controlled comparison using the saved MLP settings, e.g. 1 2 3 5')
+    p.add_argument('--baseline-dir',default='results/mlp',help='Saved unweighted MLP for the controlled comparison')
     p.add_argument('--out-dir',help='Default: results/<model-type>')
     p.add_argument('--max-reads',type=int,default=64)
     p.add_argument('--epochs',type=int,default=30)
@@ -288,12 +403,16 @@ def main():
     p.add_argument('--class-weight',choices=['none','balanced'],default='none',help='GB weighting and neural baseline weighting; neural search also compares both')
     p.set_defaults(selection_metric='pr_auc')
     args=p.parse_args()
-    if args.out_dir is None: args.out_dir=f'results/{args.model_type}'
+    if args.out_dir is None: args.out_dir='results/mlp_weight_comparison' if args.mlp_positive_weights else f'results/{args.model_type}'
     if args.clean_dirs and args.label_files:
         p.error('--label-files requires --data-files')
     if args.data_files and (not args.label_files or len(args.label_files)!=len(args.data_files)):
         p.error('Supply matching --label-files entries for all --data-files')
-    try: train_unified(args)
+    if args.mlp_positive_weights and (args.model_type!='mlp' or not args.clean_dirs):
+        p.error('--mlp-positive-weights requires --model-type mlp and --clean-dirs')
+    try:
+        if args.mlp_positive_weights: compare_mlp_weights(args)
+        else: train_unified(args)
     except (ValueError,OSError) as error: p.error(str(error))
 
 
