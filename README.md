@@ -8,7 +8,6 @@ Each model learns jointly from the **training portions of dataset0, dataset1, an
 - **Training, prediction, and evaluation commands:** [MLP.md](MLP.md)
 - **Data preparation:** [DATA_PREPARATION.md](DATA_PREPARATION.md)
 
-Older separate-dataset models and their results have been removed. The shared MLP is retained, with shared GB and MIL added for comparison. Raw and cleaned data are unchanged.
 
 ## Entry points and modules
 
