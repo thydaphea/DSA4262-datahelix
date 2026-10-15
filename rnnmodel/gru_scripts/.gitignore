@@ -1,0 +1,5 @@
+__pycache__/
+*.py[cod]
+gru_round5_model/
+gru_round5_evaluation/
+gru_round5_cv_model/

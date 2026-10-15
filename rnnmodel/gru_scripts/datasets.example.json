@@ -1,0 +1,20 @@
+{
+  "dataset2_position_groups_confirmed": true,
+  "datasets": [
+    {
+      "dataset_id": "dataset0",
+      "train_file": "../../../outputs/data_cleaning/20261014T062257_386425Z/dataset0/dataset0_clean_train.csv.gz",
+      "test_file": "../../../outputs/data_cleaning/20261014T062257_386425Z/dataset0/dataset0_clean_test.csv.gz"
+    },
+    {
+      "dataset_id": "dataset1",
+      "train_file": "../../../outputs/data_cleaning/20261014T062257_386425Z/dataset1/dataset1_clean_train.csv.gz",
+      "test_file": "../../../outputs/data_cleaning/20261014T062257_386425Z/dataset1/dataset1_clean_test.csv.gz"
+    },
+    {
+      "dataset_id": "dataset2",
+      "train_file": "../../../outputs/data_cleaning/20261014T062257_386425Z/dataset2/dataset2_clean_train.csv.gz",
+      "test_file": "../../../outputs/data_cleaning/20261014T062257_386425Z/dataset2/dataset2_clean_test.csv.gz"
+    }
+  ]
+}
