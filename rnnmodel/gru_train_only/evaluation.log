@@ -1,0 +1,10 @@
+         split dataset_id  n_evaluated  PR_AUC_trapezoidal  ROC_AUC status
+train_apparent   dataset0        78296            0.540623 0.930867     OK
+train_apparent   dataset1        59746            0.431276 0.846873     OK
+train_apparent   dataset2          777            0.980225 0.910640     OK
+train_apparent   COMBINED       138819            0.538173 0.896047     OK
+    validation   dataset0        19583            0.471213 0.918018     OK
+    validation   dataset1        13634            0.390897 0.820711     OK
+    validation   dataset2          238            0.985529 0.919262     OK
+    validation   COMBINED        33455            0.499775 0.880714     OK
+Saved evaluation and predictions: /home/ubuntu/project/DSA4262-datahelix/rnnmodel/gru_train_only/validation_predictions

@@ -1,0 +1,10 @@
+{
+  "one_oof_per_row": true,
+  "five_files_match_combined": true,
+  "all_saved_models_reloaded": true,
+  "scalers_match_training_folds_only": true,
+  "no_oof_checkpoint_selection": true,
+  "fold_group_overlap": 0,
+  "test_used_for_training_or_selection": false,
+  "input_hashes_unchanged": true
+}

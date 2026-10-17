@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "n_training_rows": 172274,
+  "original_split_counts": {
+    "train": 138819,
+    "validation": 33455
+  },
+  "round6_config_matches": true,
+  "all_32_epochs_completed": true,
+  "preprocessing_matches_merged_training_only": true,
+  "saved_model_predictions_match": true,
+  "artifact_and_input_hashes_match": true,
+  "test_site_and_group_overlap": 0,
+  "test_evaluated": false
+}

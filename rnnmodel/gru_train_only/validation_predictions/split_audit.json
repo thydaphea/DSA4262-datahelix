@@ -1,0 +1,10 @@
+{
+  "train_rows": 138819,
+  "validation_rows": 33455,
+  "train_groups": 3230,
+  "validation_groups": 807,
+  "shared_sites": 0,
+  "shared_biological_groups": 0,
+  "dataset2_position_groups_confirmed": true,
+  "cross_dataset_repeated_train_site_rows": 88204
+}

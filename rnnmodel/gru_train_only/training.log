@@ -1,0 +1,39 @@
+Fitting all 138,819 training rows for 32 epochs; device=cpu
+model: epoch 1/32, loss=0.29636
+model: epoch 2/32, loss=0.18830
+model: epoch 3/32, loss=0.17642
+model: epoch 4/32, loss=0.16744
+model: epoch 5/32, loss=0.16278
+model: epoch 6/32, loss=0.16022
+model: epoch 7/32, loss=0.15842
+model: epoch 8/32, loss=0.15694
+model: epoch 9/32, loss=0.15565
+model: epoch 10/32, loss=0.15452
+model: epoch 11/32, loss=0.15344
+model: epoch 12/32, loss=0.15268
+model: epoch 13/32, loss=0.15193
+model: epoch 14/32, loss=0.15111
+model: epoch 15/32, loss=0.15043
+model: epoch 16/32, loss=0.14987
+model: epoch 17/32, loss=0.14953
+model: epoch 18/32, loss=0.14889
+model: epoch 19/32, loss=0.14834
+model: epoch 20/32, loss=0.14801
+model: epoch 21/32, loss=0.14758
+model: epoch 22/32, loss=0.14725
+model: epoch 23/32, loss=0.14689
+model: epoch 24/32, loss=0.14643
+model: epoch 25/32, loss=0.14626
+model: epoch 26/32, loss=0.14591
+model: epoch 27/32, loss=0.14561
+model: epoch 28/32, loss=0.14538
+model: epoch 29/32, loss=0.14515
+model: epoch 30/32, loss=0.14488
+model: epoch 31/32, loss=0.14460
+model: epoch 32/32, loss=0.14439
+         split dataset_id  n_evaluated  PR_AUC_trapezoidal  ROC_AUC status
+train_apparent   dataset0        78296            0.540623 0.930867     OK
+train_apparent   dataset1        59746            0.431276 0.846873     OK
+train_apparent   dataset2          777            0.980225 0.910640     OK
+train_apparent   COMBINED       138819            0.538173 0.896047     OK
+Saved model and training outputs: /home/ubuntu/project/DSA4262-datahelix/rnnmodel/gru_train_only/model

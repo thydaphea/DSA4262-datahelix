@@ -1,0 +1,95 @@
+{
+  "schema": "datahelix-site-gru-round6-final-v1",
+  "status": "COMPLETE",
+  "started_at": "2026-10-17T06:56:24.705281+00:00",
+  "arguments": {
+    "data_config": "DSA4262-datahelix/rnnmodel/gru_final_round6/datasets.json",
+    "output_dir": "DSA4262-datahelix/rnnmodel/gru_final_round6/model",
+    "mode": "fixed",
+    "epochs": 32,
+    "max_epochs": 32,
+    "fold_assignments": null,
+    "seed": 42,
+    "device": "auto",
+    "threads": 4
+  },
+  "config": {
+    "hidden_size": 32,
+    "dropout": 0.0,
+    "lr": 0.0003,
+    "weight_decay": 0.0,
+    "batch_size": 256,
+    "epochs": 32,
+    "class_weighting": true,
+    "alpha": 0.0,
+    "patience": 5,
+    "min_delta": 0.001
+  },
+  "device": "cpu",
+  "seed": 42,
+  "inputs": {
+    "dataset0": {
+      "train_file": "/home/ubuntu/project/outputs/data_cleaning/20261014T062257_386425Z_standardized_5folds/dataset0/dataset0_clean_train.csv.gz",
+      "train_sha256": "b3ee302e4021b1f6694f4f075ca8f82e8df495db43fd845b05226cdacfc95ca2",
+      "test_file": "/home/ubuntu/project/outputs/data_cleaning/20261014T062257_386425Z_standardized_5folds/dataset0/dataset0_clean_test.csv.gz",
+      "test_sha256": "e35875ef1f053436cb20a905cf7559a846d957088973484c5ad360df831f3e2e"
+    },
+    "dataset1": {
+      "train_file": "/home/ubuntu/project/outputs/data_cleaning/20261014T062257_386425Z_standardized_5folds/dataset1/dataset1_clean_train.csv.gz",
+      "train_sha256": "2f21360bdbf0a0fbaace80b8e4ea2752e5f842bad289831328adf412f591df67",
+      "test_file": "/home/ubuntu/project/outputs/data_cleaning/20261014T062257_386425Z_standardized_5folds/dataset1/dataset1_clean_test.csv.gz",
+      "test_sha256": "aa50e7cf90671ad27076909a2c8e50b601906ddb4564531a4f6ed03b9b3e3ca6"
+    },
+    "dataset2": {
+      "train_file": "/home/ubuntu/project/outputs/data_cleaning/20261014T062257_386425Z_standardized_5folds/dataset2/dataset2_clean_train.csv.gz",
+      "train_sha256": "c88fd2a1e25246dc1620f708a88157bebc2a68d3b75091c78f214af4107d36f6",
+      "test_file": "/home/ubuntu/project/outputs/data_cleaning/20261014T062257_386425Z_standardized_5folds/dataset2/dataset2_clean_test.csv.gz",
+      "test_sha256": "fe83b5b54a5c63534cb990a8ac3dd85525e3d5e90ba441d9127c745df3eeaf61"
+    }
+  },
+  "dataset2_position_groups_confirmed": true,
+  "environment": {
+    "python": "3.14.8 | packaged by conda-forge | (main, Oct  7 2026, 00:23:19) [GCC 15.3.0]",
+    "packages": {
+      "numpy": "2.5.4",
+      "pandas": "2.3.3",
+      "torch": "2.14.1",
+      "scikit-learn": "1.9.1",
+      "matplotlib": "3.11.2"
+    }
+  },
+  "test_evaluated": false,
+  "configuration_selection": {
+    "selected_config": {
+      "hidden_size": 32,
+      "dropout": 0.0,
+      "lr": 0.0003,
+      "weight_decay": 0.0,
+      "batch_size": 256,
+      "epochs": 50,
+      "class_weighting": true,
+      "alpha": 0.0,
+      "patience": 5,
+      "min_delta": 0.001
+    },
+    "selected_by": "mean fold trapezoidal PR AUC; ROC AUC; reference weight_decay; lower weight_decay",
+    "suggested_final_epochs": 32,
+    "duration_rule": "rounded median best epoch; recompute after later tuning",
+    "test_evaluated": false
+  },
+  "configuration_selection_sha256": "114dcdf89e7bbefdcca4a5aba7feccc84d864de16a3af93ae6eac5c2c2d228e6",
+  "training_population": "all original train + original validation; fold metadata excluded from model inputs",
+  "finished_at": "2026-10-17T06:58:59.330312+00:00",
+  "elapsed_seconds": 161.18892278100066,
+  "final_fit": {
+    "epochs_run": 32,
+    "selected_epoch": 32,
+    "stop_reason": "epoch_limit",
+    "pos_weight": 1.0
+  },
+  "refit_epochs": 32,
+  "artifacts": {
+    "model.pt": "4d6fa84cbe2058de7dd532996fbf207bbd95f6b30c1c6505cdbaec988fb3eac7",
+    "preprocessing.json": "696f689beb7d0da060c71f1edd6d500ec60e8f646c302240a5d94cb60042fd67"
+  }
+}

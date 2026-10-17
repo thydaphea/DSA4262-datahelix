@@ -1,0 +1,19 @@
+{
+  "train_rows": 172274,
+  "test_rows": 41697,
+  "train_groups": 4037,
+  "test_groups": 1023,
+  "shared_sites": 0,
+  "shared_biological_groups": 0,
+  "dataset2_position_groups_confirmed": true,
+  "cross_dataset_repeated_train_site_rows": 108810,
+  "train_rows_by_dataset": {
+    "dataset0": 97879,
+    "dataset1": 73380,
+    "dataset2": 1015
+  },
+  "original_split_counts": {
+    "train": 138819,
+    "validation": 33455
+  }
+}

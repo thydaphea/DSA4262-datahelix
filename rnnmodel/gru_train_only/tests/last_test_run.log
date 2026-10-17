@@ -1,0 +1,13 @@
+test_early_stopping_saves_small_improvements (test_pipeline.CoreTests.test_early_stopping_saves_small_improvements) ... ok
+test_exact_model_and_preprocessing (test_pipeline.CoreTests.test_exact_model_and_preprocessing) ... ok
+test_group_overlap_and_cross_dataset_links (test_pipeline.CoreTests.test_group_overlap_and_cross_dataset_links) ... ok
+test_invalid_input_rejected (test_pipeline.CoreTests.test_invalid_input_rejected) ... ok
+test_metrics_edge_cases (test_pipeline.CoreTests.test_metrics_edge_cases) ... ok
+test_mixture_exception_requires_matching_metadata (test_pipeline.CoreTests.test_mixture_exception_requires_matching_metadata) ... ok
+test_cli_train_reload_and_internal_cv (test_pipeline.SplitTests.test_cli_train_reload_and_internal_cv) ... ok
+test_original_split_filter_and_unknown_values (test_pipeline.SplitTests.test_original_split_filter_and_unknown_values) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 31.177s
+
+OK

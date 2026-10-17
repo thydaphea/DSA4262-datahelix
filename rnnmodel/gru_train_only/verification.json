@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "train_rows": 138819,
+  "validation_rows": 33455,
+  "configuration_matches_original": true,
+  "fresh_model_weights": true,
+  "preprocessing_matches_training_only": true,
+  "exact_validation_row_coverage": true,
+  "saved_model_reload_matches": true,
+  "original_model_unchanged": true,
+  "regression_tests_passed": 8
+}

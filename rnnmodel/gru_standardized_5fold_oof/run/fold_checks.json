@@ -1,0 +1,77 @@
+[
+  {
+    "fold": 1,
+    "n_train": 137819,
+    "n_oof": 34455,
+    "shared_groups": 0,
+    "saved_model_roundtrip": true,
+    "fit_summary": {
+      "epochs_run": 32,
+      "selected_epoch": 32,
+      "stop_reason": "epoch_limit",
+      "pos_weight": 1.0
+    },
+    "model_sha256": "350fb637a350fc6c3d4d59c235fdbc8b55af18a77f8ddb26b3f4643331f44877",
+    "preprocessing_sha256": "7c2519c3e4a306612a8cf55cf622630d8f933c1df9f0f747fddbddcebf32bcdf"
+  },
+  {
+    "fold": 2,
+    "n_train": 137819,
+    "n_oof": 34455,
+    "shared_groups": 0,
+    "saved_model_roundtrip": true,
+    "fit_summary": {
+      "epochs_run": 32,
+      "selected_epoch": 32,
+      "stop_reason": "epoch_limit",
+      "pos_weight": 1.0
+    },
+    "model_sha256": "d1f13d0539da06b9aca8d39b5c3a544c1a719f3c1515d46eedd6ea7b6a8aba12",
+    "preprocessing_sha256": "4fec2c333db402c311d07d7450e8ffa46630c351879fc6f02db998bd24277954"
+  },
+  {
+    "fold": 3,
+    "n_train": 137819,
+    "n_oof": 34455,
+    "shared_groups": 0,
+    "saved_model_roundtrip": true,
+    "fit_summary": {
+      "epochs_run": 32,
+      "selected_epoch": 32,
+      "stop_reason": "epoch_limit",
+      "pos_weight": 1.0
+    },
+    "model_sha256": "4cdbe335a73b5b0d0d8f7f9a2d4b6c69387fe9a68151640e476e5710b95a2dec",
+    "preprocessing_sha256": "1d34136c03eb8e35d4540dbae528ce2ed5da1528b2cfb8cbb608e48c9dca74ee"
+  },
+  {
+    "fold": 4,
+    "n_train": 137819,
+    "n_oof": 34455,
+    "shared_groups": 0,
+    "saved_model_roundtrip": true,
+    "fit_summary": {
+      "epochs_run": 32,
+      "selected_epoch": 32,
+      "stop_reason": "epoch_limit",
+      "pos_weight": 1.0
+    },
+    "model_sha256": "bc94bd14d564f8a948239beb92657550eef37bf925e490e230bbe1412b02e78b",
+    "preprocessing_sha256": "8170c10435df1d594832a42f1b1fe3d1eee2973b93739d8bdfb81230ca1610c1"
+  },
+  {
+    "fold": 5,
+    "n_train": 137820,
+    "n_oof": 34454,
+    "shared_groups": 0,
+    "saved_model_roundtrip": true,
+    "fit_summary": {
+      "epochs_run": 32,
+      "selected_epoch": 32,
+      "stop_reason": "epoch_limit",
+      "pos_weight": 1.0
+    },
+    "model_sha256": "8b982ee41949e4f6c9ac2aefb87d87c15b4e25b497b35d49000e78ca379a7271",
+    "preprocessing_sha256": "d6bae8246f184bb50692080f655d7f1b98e97955e52c58fadff56cf3506aee19"
+  }
+]
