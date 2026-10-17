@@ -19,6 +19,46 @@ python train.py --model-type mlp --data-files data/dataset0.json.gz data/dataset
 
 Choose a new output directory when repeating a run. The default is `results/<model-type>`. The broader search ranges and screening protocol are documented in [README.md](README.md#shared-model-comparison). This is a bounded search, not an exhaustive optimum. Neural architecture, optimizer settings, and weighting selected by validation are recorded under `model_selection.best_params` in each model's `metrics.json`.
 
+## Five-fold MLP cross-validation
+
+The supplied grouped folds are available in `data/prepared_cv`. The CV script trains one shared MLP across dataset0/1/2, using the selected `[256, 128]` hidden layers, dropout `0.5`, AdamW learning rate `0.001`, weight decay `0.0001`, batch size `256`, unweighted loss, and 16 epochs per fold. It fits feature standardization separately on each fold's training rows only. Each fold's OOF predictions come from a model trained on the other four folds; original test rows are excluded.
+
+```bash
+python -m scripts.train_mlp_5fold_cv
+```
+
+The default output directory is `outputs/mlp_5fold_cv`. It contains one compressed OOF prediction file per fold, the combined `oof_predictions.csv.gz`, `oof_metrics.csv`, and run metadata. The train+validation rows are combined for CV and retain their original split marker; the held-out original test data is not used by this script.
+
+## Five-fold GB cross-validation
+
+The GB CV script uses the same shared 74 pooled features and supplied grouped folds, with the selected GB configuration: 63 leaves, 600 iterations, learning rate `0.03`, L2 regularization `1.0`, and minimum leaf size `10`. It does not scale features, matching the original GB workflow. Each fold trains jointly across dataset0/1/2 and writes OOF predictions only for the omitted fold; original test rows are excluded.
+
+```bash
+python -m scripts.train_gb_5fold_cv
+```
+
+The default output directory is `outputs/gb_5fold_cv`. It contains one compressed OOF prediction file per fold, the combined `oof_predictions.csv.gz`, `oof_metrics.csv`, and run metadata.
+
+## Final GB model
+
+To fit one GB model on all original train and validation rows, while keeping the original test rows out of training, run:
+
+```bash
+python -m scripts.train_gb_final
+```
+
+This uses the selected GB configuration and saves a prediction-compatible `model.joblib` plus input and training metadata to `outputs/gb_final_train_validation`. Choose a new `--out-dir` to train another copy; the script does not overwrite existing output.
+
+## Final MLP model
+
+To fit a fresh MLP on all original train and validation rows, while keeping the original test rows out of training, run:
+
+```bash
+python -m scripts.train_mlp_final
+```
+
+This uses the selected `[256, 128]` architecture, dropout `0.5`, learning rate `0.001`, weight decay `0.0001`, batch size `256`, unweighted loss, and 16 epochs. Feature means and standard deviations are learned from all train+validation rows. The prediction-compatible `model.joblib`, training history, and input metadata are saved to `outputs/mlp_final_train_validation`; choose a new `--out-dir` rather than overwriting existing output.
+
 ## Splits
 
 The joint group split is stratified by dataset and binary label, using seed 42. Known genes and transcript fallbacks stay in one partition across dataset0 and dataset1. Matching dataset2 positions across mixture conditions also stay together. Dataset2 uses label 1 for any modification fraction greater than zero.

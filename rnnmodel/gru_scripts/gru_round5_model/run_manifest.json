@@ -1,0 +1,75 @@
+{
+  "schema": "datahelix-site-gru-round5-v1",
+  "status": "COMPLETE",
+  "started_at": "2026-10-15T06:44:56.354438+00:00",
+  "arguments": {
+    "data_config": "datasets.example.json",
+    "output_dir": "gru_round5_model",
+    "mode": "fixed",
+    "epochs": 32,
+    "max_epochs": 50,
+    "fold_assignments": null,
+    "seed": 42,
+    "device": "auto",
+    "threads": 4
+  },
+  "config": {
+    "hidden_size": 32,
+    "dropout": 0.0,
+    "lr": 0.0003,
+    "weight_decay": 0.0001,
+    "batch_size": 256,
+    "epochs": 50,
+    "class_weighting": true,
+    "alpha": 0.0,
+    "patience": 5,
+    "min_delta": 0.001
+  },
+  "device": "cpu",
+  "seed": 42,
+  "inputs": {
+    "dataset0": {
+      "train_file": "/home/ubuntu/project/outputs/data_cleaning/20261014T062257_386425Z/dataset0/dataset0_clean_train.csv.gz",
+      "train_sha256": "078492e49c40f27f668316f0d3b650085c0d590295981be09871924ace1c929b",
+      "test_file": "/home/ubuntu/project/outputs/data_cleaning/20261014T062257_386425Z/dataset0/dataset0_clean_test.csv.gz",
+      "test_sha256": "e35875ef1f053436cb20a905cf7559a846d957088973484c5ad360df831f3e2e"
+    },
+    "dataset1": {
+      "train_file": "/home/ubuntu/project/outputs/data_cleaning/20261014T062257_386425Z/dataset1/dataset1_clean_train.csv.gz",
+      "train_sha256": "e09279b8952e0f24a1a5a1a4eaf94c5acf9e80c45db874205b557c3883de9c67",
+      "test_file": "/home/ubuntu/project/outputs/data_cleaning/20261014T062257_386425Z/dataset1/dataset1_clean_test.csv.gz",
+      "test_sha256": "aa50e7cf90671ad27076909a2c8e50b601906ddb4564531a4f6ed03b9b3e3ca6"
+    },
+    "dataset2": {
+      "train_file": "/home/ubuntu/project/outputs/data_cleaning/20261014T062257_386425Z/dataset2/dataset2_clean_train.csv.gz",
+      "train_sha256": "8c45bab6c6127ed0fea96a26e88ac051b6bd90c32234d588756b8974ccb165b3",
+      "test_file": "/home/ubuntu/project/outputs/data_cleaning/20261014T062257_386425Z/dataset2/dataset2_clean_test.csv.gz",
+      "test_sha256": "fe83b5b54a5c63534cb990a8ac3dd85525e3d5e90ba441d9127c745df3eeaf61"
+    }
+  },
+  "dataset2_position_groups_confirmed": true,
+  "environment": {
+    "python": "3.14.8 | packaged by conda-forge | (main, Oct  7 2026, 00:23:19) [GCC 15.3.0]",
+    "packages": {
+      "numpy": "2.5.4",
+      "pandas": "2.3.3",
+      "torch": "2.14.1",
+      "scikit-learn": "1.9.1",
+      "matplotlib": "3.11.2"
+    }
+  },
+  "test_evaluated": false,
+  "finished_at": "2026-10-15T06:48:23.328889+00:00",
+  "elapsed_seconds": 212.43793873200048,
+  "final_fit": {
+    "epochs_run": 32,
+    "selected_epoch": 32,
+    "stop_reason": "epoch_limit",
+    "pos_weight": 1.0
+  },
+  "refit_epochs": 32,
+  "artifacts": {
+    "model.pt": "a36f4694028b02b58352c571a3833ba8b10ba06b28b20889b4defdb846d4b754",
+    "preprocessing.json": "da56d464e2de4b269b4d3f1f5da0ff9564e8392ed13fb7a5af21219b199cdf1e"
+  }
+}

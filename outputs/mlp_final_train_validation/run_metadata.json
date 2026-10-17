@@ -1,0 +1,85 @@
+{
+  "model": "shared_mlp_final",
+  "schema": "nine-signals-summary-v1",
+  "config": {
+    "network_config": {
+      "hidden": [
+        256,
+        128
+      ],
+      "dropout": 0.5
+    },
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001,
+    "batch_size": 256,
+    "loss": "BCEWithLogitsLoss (unweighted)",
+    "epochs": 16,
+    "seed": 42,
+    "threads": 1,
+    "normalization": "74 feature means and population standard deviations fitted on all original train+validation rows"
+  },
+  "training": {
+    "rows": 172274,
+    "features": 74,
+    "positives": 10607,
+    "test_rows_used": 0,
+    "datasets": {
+      "dataset0": {
+        "rows": 97879,
+        "positives": 4398,
+        "original_split_counts": {
+          "train": 78296,
+          "validation": 19583
+        }
+      },
+      "dataset1": {
+        "rows": 73380,
+        "positives": 5339,
+        "original_split_counts": {
+          "train": 59746,
+          "validation": 13634
+        }
+      },
+      "dataset2": {
+        "rows": 1015,
+        "positives": 870,
+        "original_split_counts": {
+          "train": 777,
+          "validation": 238
+        }
+      }
+    }
+  },
+  "inputs": {
+    "prepared_metadata": {
+      "path": "/home/ubuntu/project/DSA4262-datahelix/data/prepared_cv/metadata.json",
+      "sha256": "8d45aba27946532e0e198c234eb8104326293fa7fea3cb75ab647839d80723e6"
+    },
+    "train_validation_files": {
+      "dataset0": {
+        "path": "/home/ubuntu/project/DSA4262-datahelix/data/prepared_cv/dataset0/train_validation.csv.gz",
+        "sha256": "27bc0522368c3edef17dd975af5844e600b37197b89bdc82e53b3d7e5ef7173e"
+      },
+      "dataset1": {
+        "path": "/home/ubuntu/project/DSA4262-datahelix/data/prepared_cv/dataset1/train_validation.csv.gz",
+        "sha256": "8a30ae3cab8096fe398e0bb9f51e02091984577d5405fee91be6e2ed790d5893"
+      },
+      "dataset2": {
+        "path": "/home/ubuntu/project/DSA4262-datahelix/data/prepared_cv/dataset2/train_validation.csv.gz",
+        "sha256": "9f47fc86995af511520c5bae00d5627f53daa29a49cd6ed210da3397d2ed6d9d"
+      }
+    }
+  },
+  "environment": {
+    "python": "3.14.8",
+    "numpy": "2.5.4",
+    "pandas": "2.3.3",
+    "scikit_learn": "1.9.1",
+    "torch": "2.14.1+cu130"
+  },
+  "model_file": {
+    "path": "model.joblib",
+    "sha256": "3cca37ce3c4e1aced8f166cef286366610a17be99aaef06f576298c139169d62",
+    "bytes": 210626
+  }
+}
