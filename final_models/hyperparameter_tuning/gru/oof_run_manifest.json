@@ -1,0 +1,90 @@
+{
+  "status": "COMPLETE",
+  "started_at": "2026-10-17T05:55:12.433022+00:00",
+  "config": {
+    "hidden_size": 32,
+    "dropout": 0.0,
+    "lr": 0.0003,
+    "weight_decay": 0.0,
+    "batch_size": 256,
+    "epochs": 32,
+    "class_weighting": true,
+    "alpha": 0.0,
+    "patience": 5,
+    "min_delta": 0.001
+  },
+  "epochs": 32,
+  "configuration_source": "/home/ubuntu/project/outputs/gru_weight_decay_round6/20261015T004132_998613Z/next_round_handoff.json",
+  "configuration_source_sha256": "114dcdf89e7bbefdcca4a5aba7feccc84d864de16a3af93ae6eac5c2c2d228e6",
+  "fold_manifest_sha256": "8cdd4a89f937886611066f1f57c6d219735221d27eaf57ff6c1258184d442905",
+  "inputs": [
+    {
+      "path": "/home/ubuntu/project/outputs/data_cleaning/20261014T062257_386425Z_standardized_5folds/dataset0/dataset0_clean_train.csv.gz",
+      "sha256": "b3ee302e4021b1f6694f4f075ca8f82e8df495db43fd845b05226cdacfc95ca2",
+      "use": "fit and OOF"
+    },
+    {
+      "path": "/home/ubuntu/project/outputs/data_cleaning/20261014T062257_386425Z_standardized_5folds/dataset0/dataset0_clean_test.csv.gz",
+      "sha256": "e35875ef1f053436cb20a905cf7559a846d957088973484c5ad360df831f3e2e",
+      "use": "metadata-only separation audit"
+    },
+    {
+      "path": "/home/ubuntu/project/outputs/data_cleaning/20261014T062257_386425Z_standardized_5folds/dataset1/dataset1_clean_train.csv.gz",
+      "sha256": "2f21360bdbf0a0fbaace80b8e4ea2752e5f842bad289831328adf412f591df67",
+      "use": "fit and OOF"
+    },
+    {
+      "path": "/home/ubuntu/project/outputs/data_cleaning/20261014T062257_386425Z_standardized_5folds/dataset1/dataset1_clean_test.csv.gz",
+      "sha256": "aa50e7cf90671ad27076909a2c8e50b601906ddb4564531a4f6ed03b9b3e3ca6",
+      "use": "metadata-only separation audit"
+    },
+    {
+      "path": "/home/ubuntu/project/outputs/data_cleaning/20261014T062257_386425Z_standardized_5folds/dataset2/dataset2_clean_train.csv.gz",
+      "sha256": "c88fd2a1e25246dc1620f708a88157bebc2a68d3b75091c78f214af4107d36f6",
+      "use": "fit and OOF"
+    },
+    {
+      "path": "/home/ubuntu/project/outputs/data_cleaning/20261014T062257_386425Z_standardized_5folds/dataset2/dataset2_clean_test.csv.gz",
+      "sha256": "fe83b5b54a5c63534cb990a8ac3dd85525e3d5e90ba441d9127c745df3eeaf61",
+      "use": "metadata-only separation audit"
+    }
+  ],
+  "device": "cpu",
+  "environment": {
+    "python": "3.14.8 | packaged by conda-forge | (main, Oct  7 2026, 00:23:19) [GCC 15.3.0]",
+    "packages": {
+      "numpy": "2.5.4",
+      "pandas": "2.3.3",
+      "torch": "2.14.1",
+      "scikit-learn": "1.9.1",
+      "matplotlib": "3.11.2"
+    }
+  },
+  "seed_rule": "42 + held-out fold number",
+  "split_audit": {
+    "train_rows": 172274,
+    "test_rows": 41697,
+    "train_groups": 4037,
+    "test_groups": 1023,
+    "shared_sites": 0,
+    "shared_biological_groups": 0,
+    "dataset2_position_groups_confirmed": true,
+    "cross_dataset_repeated_train_site_rows": 108810
+  },
+  "fold_policy": "Use existing fold column; fit fold != k, predict fold == k",
+  "checkpoint_policy": "Fixed 32 epochs from historical round-6 selection; no OOF early stopping",
+  "caveat": "Hyperparameters and duration were historically selected on this merged population; OOF predictions exclude rows from weight/scaler fitting but are not nested-CV generalization estimates.",
+  "finished_at": "2026-10-17T06:05:26.712907+00:00",
+  "n_oof": 172274,
+  "verification": {
+    "one_oof_per_row": true,
+    "five_files_match_combined": true,
+    "all_saved_models_reloaded": true,
+    "scalers_match_training_folds_only": true,
+    "no_oof_checkpoint_selection": true,
+    "fold_group_overlap": 0,
+    "test_used_for_training_or_selection": false,
+    "input_hashes_unchanged": true
+  },
+  "combined_sha256": "510641271063784da311fd9cc4fe7b9a29ad1396092454352b9788b34d993daa"
+}

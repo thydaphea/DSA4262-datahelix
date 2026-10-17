@@ -1,0 +1,7 @@
+cff-version: 1.2.0
+message: "Please cite this software and record the commit or package checksum used."
+type: software
+title: "DataHelix: m6A site prediction with GB, MLP and GRU ensembles"
+authors:
+  - name: "DataHelix contributors"
+repository-code: "https://github.com/thydaphea/DSA4262-datahelix"

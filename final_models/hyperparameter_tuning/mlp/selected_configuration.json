@@ -1,0 +1,29 @@
+{
+  "source": "metrics.json:model_selection",
+  "metric": "pooled_validation_pr_auc",
+  "best_score": 0.492715028631486,
+  "best_epoch": 16,
+  "epochs_run": 22,
+  "best_candidate": 9,
+  "best_params": {
+    "network_config": {
+      "hidden": [
+        256,
+        128
+      ],
+      "dropout": 0.5
+    },
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001,
+    "batch_size": 256,
+    "class_weight": "none"
+  },
+  "screened_candidates": 12,
+  "finalists": [
+    1,
+    9,
+    12
+  ],
+  "screen_epochs": 4,
+  "matches_current_final_configuration": true
+}

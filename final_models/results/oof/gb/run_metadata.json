@@ -1,0 +1,110 @@
+{
+  "model": "shared_gb",
+  "feature_schema": "nine-signals-summary-v1",
+  "config": {
+    "max_leaf_nodes": 63,
+    "max_iter": 600,
+    "learning_rate": 0.03,
+    "l2_regularization": 1.0,
+    "min_samples_leaf": 10,
+    "loss": "binary cross-entropy",
+    "class_weight": "none",
+    "early_stopping": false,
+    "random_state": 42,
+    "threads": 1,
+    "normalization": "none (matches selected GB configuration)"
+  },
+  "cv": {
+    "fold_numbers": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "training_rows": 172274,
+    "test_rows_excluded": true,
+    "original_split_values": [
+      "train",
+      "validation"
+    ],
+    "per_fold": {
+      "1": {
+        "fit_rows": 137819,
+        "oof_rows": 34455
+      },
+      "2": {
+        "fit_rows": 137819,
+        "oof_rows": 34455
+      },
+      "3": {
+        "fit_rows": 137819,
+        "oof_rows": 34455
+      },
+      "4": {
+        "fit_rows": 137819,
+        "oof_rows": 34455
+      },
+      "5": {
+        "fit_rows": 137820,
+        "oof_rows": 34454
+      }
+    }
+  },
+  "inputs": {
+    "prepared_metadata": {
+      "path": "/home/ubuntu/project/DSA4262-datahelix/data/prepared_cv/metadata.json",
+      "sha256": "8d45aba27946532e0e198c234eb8104326293fa7fea3cb75ab647839d80723e6"
+    },
+    "training_files": {
+      "dataset0": {
+        "path": "/home/ubuntu/project/DSA4262-datahelix/data/prepared_cv/dataset0/train_validation.csv.gz",
+        "sha256": "27bc0522368c3edef17dd975af5844e600b37197b89bdc82e53b3d7e5ef7173e"
+      },
+      "dataset1": {
+        "path": "/home/ubuntu/project/DSA4262-datahelix/data/prepared_cv/dataset1/train_validation.csv.gz",
+        "sha256": "8a30ae3cab8096fe398e0bb9f51e02091984577d5405fee91be6e2ed790d5893"
+      },
+      "dataset2": {
+        "path": "/home/ubuntu/project/DSA4262-datahelix/data/prepared_cv/dataset2/train_validation.csv.gz",
+        "sha256": "9f47fc86995af511520c5bae00d5627f53daa29a49cd6ed210da3397d2ed6d9d"
+      }
+    }
+  },
+  "environment": {
+    "python": "3.14.8",
+    "numpy": "2.5.4",
+    "pandas": "2.3.3",
+    "scikit_learn": "1.9.1"
+  },
+  "outputs": {
+    "fold_1_oof_predictions.csv.gz": {
+      "sha256": "f5291534d248d5cf18412fb55cfab029da5cfe6f8c7771827fc01746c6670f9d",
+      "bytes": 550835
+    },
+    "fold_2_oof_predictions.csv.gz": {
+      "sha256": "3d5602605cb7692c21b551bc83ae5b566975b475d32e0d16b279c60fb9f35fd8",
+      "bytes": 550706
+    },
+    "fold_3_oof_predictions.csv.gz": {
+      "sha256": "2408878a36ddad322a99a0abdf349406b6fd42b581d41530e06b73fb8e6cb4de",
+      "bytes": 551380
+    },
+    "fold_4_oof_predictions.csv.gz": {
+      "sha256": "7bd4b338237826409e0e0c06844ea3600e38943d6175befbbc4658f04eff0395",
+      "bytes": 551556
+    },
+    "fold_5_oof_predictions.csv.gz": {
+      "sha256": "6bcb716474ae215da9feeb93cd8e3720da42252e26e9ddc4a250cb6bd29230e3",
+      "bytes": 551128
+    },
+    "oof_metrics.csv": {
+      "sha256": "7d48384453a547beb5760b203e4cb2f12cda31df1c25532b7a8ff2d6493cfaef",
+      "bytes": 611
+    },
+    "oof_predictions.csv.gz": {
+      "sha256": "c036edd28b3b982f87e2bb52a5b06c8eb929f7529fa5627ab5cbeaad9c75d74c",
+      "bytes": 2769503
+    }
+  }
+}

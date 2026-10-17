@@ -1,0 +1,12 @@
+{
+  "hidden_size": 32,
+  "dropout": 0.0,
+  "lr": 0.0003,
+  "weight_decay": 0.0,
+  "batch_size": 256,
+  "epochs": 32,
+  "class_weighting": true,
+  "alpha": 0.0,
+  "patience": 5,
+  "min_delta": 0.001
+}

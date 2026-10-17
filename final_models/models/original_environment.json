@@ -1,0 +1,18 @@
+{
+  "python": "3.14.8",
+  "platform": "Linux-7.0.0-1014-aws-x86_64-with-glibc2.43",
+  "packages": {
+    "numpy": "2.5.4",
+    "pandas": "2.3.3",
+    "scikit-learn": "1.9.1",
+    "scipy": "1.18.1",
+    "torch": "2.14.1",
+    "matplotlib": "3.11.2",
+    "joblib": "1.6.0",
+    "threadpoolctl": "3.7.0",
+    "nbformat": "not installed in packaging environment",
+    "nbconvert": "not installed in packaging environment",
+    "ipykernel": "7.4.0"
+  },
+  "note": "Recorded packaging environment; historical fit environments remain in model run manifests."
+}

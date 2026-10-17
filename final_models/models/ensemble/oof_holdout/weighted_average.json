@@ -1,0 +1,30 @@
+{
+  "feature_order": [
+    "gru_score",
+    "mlp_score",
+    "gb_score"
+  ],
+  "weights": [
+    0.44,
+    0.4,
+    0.16
+  ],
+  "constraint": "nonnegative weights summing to 1",
+  "training_folds": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "selection": {
+    "candidate": 264,
+    "stage": "local_0.01",
+    "gru_score": 0.44,
+    "mlp_score": 0.4,
+    "gb_score": 0.16,
+    "mean_cv_roc_auc": 0.8869308063801972,
+    "mean_cv_pr_auc_trapezoidal": 0.5090575872263914,
+    "mean_cv_average_precision": 0.509194969935484,
+    "fold_pr_auc": "[0.5168704843382104, 0.505549895255215, 0.5084598547958609, 0.5053501145162793]"
+  }
+}

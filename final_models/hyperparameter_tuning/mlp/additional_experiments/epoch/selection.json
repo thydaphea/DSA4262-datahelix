@@ -1,0 +1,53 @@
+{
+  "selection_metric": "pooled_validation_pr_auc",
+  "selected_checkpoint_epoch": 16,
+  "configurations": [
+    {
+      "checkpoint_epoch": 16,
+      "validation_pr_auc": 0.492715028631486,
+      "best_epoch": 16,
+      "model_path": "/home/ubuntu/project/results/mlp/model.joblib",
+      "model_sha256": "8c31c5715b620e26bd775018e54b3d537ed66c426cc69c3bd9f4626390501385",
+      "baseline_reused": true
+    },
+    {
+      "checkpoint_epoch": 28,
+      "validation_pr_auc": 0.4749308633779653,
+      "best_epoch": 28,
+      "model_path": "/home/ubuntu/project/results/mlp_epoch_comparison/epoch_28/model.joblib",
+      "model_sha256": "3426cd0f9753e08dc16c73dcf8574ad217a7bb0c33d1bc8206ffe0f4ac154069",
+      "baseline_reused": false
+    }
+  ],
+  "fixed_parameters": {
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001,
+    "batch_size": 256,
+    "class_weight": "none"
+  },
+  "baseline_network_config": {
+    "hidden": [
+      256,
+      128
+    ],
+    "dropout": 0.5
+  },
+  "varied_parameter": "checkpoint_epoch",
+  "fixed_hidden_layers": [
+    256,
+    128
+  ],
+  "seed": 42,
+  "epochs": 28,
+  "patience": 0,
+  "threads": 1,
+  "baseline_model_sha256": "8c31c5715b620e26bd775018e54b3d537ed66c426cc69c3bd9f4626390501385",
+  "manifest_sha256": "057ecc094f84a412b642e803a9636ee3da1e1b03ca9b2b1375c034ee2bc7baac",
+  "note": "Only checkpoint_epoch varies. The saved baseline is reused. All validation/test metrics are unweighted. Original models are unchanged.",
+  "limitations": [
+    "One random seed; differences do not establish statistical significance.",
+    "The test set has been inspected previously; results are exploratory.",
+    "Baseline was validation-selected; experimental checkpoint is the fixed requested epoch without early stopping."
+  ],
+  "checkpoint_policy": "Retain the exact requested epoch, then compare with baseline using validation only."
+}

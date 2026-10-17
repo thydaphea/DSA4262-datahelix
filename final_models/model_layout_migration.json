@@ -1,0 +1,32 @@
+{
+  "path_mapping": {
+    "models/gb/final/run_metadata.json": "models/gb/run_metadata.json",
+    "models/gb/final/model.joblib": "models/gb/model.joblib",
+    "models/mlp/final/run_metadata.json": "models/mlp/run_metadata.json",
+    "models/mlp/final/training_history.json": "models/mlp/training_history.json",
+    "models/mlp/final/model.joblib": "models/mlp/model.joblib",
+    "models/gru/final/model/split_audit.json": "models/gru/split_audit.json",
+    "models/gru/final/model/selected_config.json": "models/gru/selected_config.json",
+    "models/gru/final/model/fit_summary.json": "models/gru/fit_summary.json",
+    "models/gru/final/model/preprocessing.json": "models/gru/preprocessing.json",
+    "models/gru/final/model/training_history.csv": "models/gru/training_history.csv",
+    "models/gru/final/model/run_manifest.json": "models/gru/run_manifest.json",
+    "models/gru/final/model/model.pt": "models/gru/model.pt"
+  },
+  "artifact_sha256": {
+    "models/gb/run_metadata.json": "cf8e30960f07951391b48acedbd9e0585460192fb3405d067759c331d5cf3e90",
+    "models/gb/model.joblib": "8a9a4ca161054a8b956ffda1012f28fdb237735236fae5687783e23c0f4c14ed",
+    "models/mlp/run_metadata.json": "3721fb052a483b9809530346ab10262ec5629b5042e353e653c3cd343c6fefd0",
+    "models/mlp/training_history.json": "e30694afbd45a96b584f840a235e747587efa312f127a2db551ae993df18bb13",
+    "models/mlp/model.joblib": "3cca37ce3c4e1aced8f166cef286366610a17be99aaef06f576298c139169d62",
+    "models/gru/split_audit.json": "19651b4edc682bc3866eb956d3202b7c89617f1d8804e6497517f62600953b8b",
+    "models/gru/selected_config.json": "8629ad7857b1f669760a264f517a425d7e6b927e49352bc389c2cb2455958576",
+    "models/gru/fit_summary.json": "cbbb5b10357773610bf3a4cf07a9760f99ea528901ffc724552eecbf2df7ac49",
+    "models/gru/preprocessing.json": "696f689beb7d0da060c71f1edd6d500ec60e8f646c302240a5d94cb60042fd67",
+    "models/gru/training_history.csv": "868fda480f0577a213eca8ae609947fe683546d8b0c2924a5c769b8b2ae3a32a",
+    "models/gru/run_manifest.json": "94e8a3fc861eb263f499da60a492ce735fdb2ac24672556ad122aab2ea6c69c3",
+    "models/gru/model.pt": "4d6fa84cbe2058de7dd532996fbf207bbd95f6b30c1c6505cdbaec988fb3eac7"
+  },
+  "model_bytes_unchanged": true,
+  "historical_records": "Original provenance and verification records retain their historical paths."
+}

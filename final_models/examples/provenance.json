@@ -1,0 +1,20 @@
+{
+  "source": "First five nonblank JSON records from the supplied dataset0.json.gz; read values unchanged.",
+  "n_sites": 5,
+  "bytes": 53062,
+  "sha256": "e4839694d44c2ee91e2be457143947773b1aa682bb33babb1d2cf5c3224b4859",
+  "contains_ground_truth_labels": false,
+  "purpose": "Unlabeled inference smoke test; not an independent performance benchmark",
+  "smoke_test": {
+    "passed": true,
+    "method": "ensemble",
+    "prediction_rows": 5,
+    "output_columns": [
+      "transcript_id",
+      "transcript_position",
+      "score"
+    ],
+    "reference_output_sha256": "a57e00c763c3680a2b33e0421da9890190008636722b7c998854843f2c0ce0c3",
+    "note": "Reference scores are saved-model predictions, not ground-truth labels."
+  }
+}

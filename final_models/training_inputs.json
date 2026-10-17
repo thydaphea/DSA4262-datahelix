@@ -1,0 +1,20 @@
+{
+  "splits": "splits.csv.gz",
+  "datasets": [
+    {
+      "dataset_id": "dataset0",
+      "data": "../../project/data/dataset0.json.gz",
+      "labels": "../../project/data/data.info.labelled"
+    },
+    {
+      "dataset_id": "dataset1",
+      "data": "../../project/data/dataset1.json.gz",
+      "labels": "../../project/data/dataset1.info"
+    },
+    {
+      "dataset_id": "dataset2",
+      "data": "../../project/data/dataset2.json.gz",
+      "labels": "../../project/data/dataset2.info"
+    }
+  ]
+}

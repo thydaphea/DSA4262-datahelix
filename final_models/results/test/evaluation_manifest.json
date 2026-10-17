@@ -1,0 +1,36 @@
+{
+  "status": "COMPLETE",
+  "input_run": "run_1",
+  "test_rows": 41697,
+  "training_performed": false,
+  "test_labels_used_for_prediction": false,
+  "methods": [
+    "gru",
+    "mlp",
+    "gb",
+    "weighted_average",
+    "logistic_regression"
+  ],
+  "weighted_average_weights": [
+    0.44,
+    0.4,
+    0.16
+  ],
+  "logistic_regression_config": {
+    "representation": "raw_logit",
+    "C": 0.01,
+    "class_weight": null
+  },
+  "inputs_sha256": {
+    "dataset/cleaned/gru/dataset0/dataset0_clean_test.csv.gz": "e35875ef1f053436cb20a905cf7559a846d957088973484c5ad360df831f3e2e",
+    "dataset/cleaned/gru/dataset1/dataset1_clean_test.csv.gz": "aa50e7cf90671ad27076909a2c8e50b601906ddb4564531a4f6ed03b9b3e3ca6",
+    "dataset/cleaned/gru/dataset2/dataset2_clean_test.csv.gz": "fe83b5b54a5c63534cb990a8ac3dd85525e3d5e90ba441d9127c745df3eeaf61",
+    "output/final_predictions/gru/run_1/predictions_test_combined.csv": "758a7424ca52b62ae54e0296eb50d5778e27826518b66ffabf61c4eba33aa6b7",
+    "output/final_predictions/mlp/run_1/predictions_test_combined.csv": "82b6e55171a4e09210a26d6b4dbaad9a73aebb3c232d8412befd1c9e520caab4",
+    "output/final_predictions/gb/run_1/predictions_test_combined.csv": "e59b6edfecef156e8d973b8f436e331ccf0b4218b01864eed90825a38b0b3c6e"
+  },
+  "ensemble_artifacts_sha256": {
+    "weighted_average.json": "95dbfed4d498e9d007baf8db864b4028d2c03fd386c40e1da0e0a71cfcb48eb9",
+    "logistic_regression.joblib": "8e5a6049fb579a73ecdd9568ac7c6dd8c3d321d4cd44d468ea12d99bbd0a9269"
+  }
+}

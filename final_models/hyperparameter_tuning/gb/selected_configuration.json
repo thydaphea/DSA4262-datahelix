@@ -1,0 +1,15 @@
+{
+  "source": "metrics.json:model_selection",
+  "metric": "pooled_validation_pr_auc",
+  "best_score": 0.47953934348545446,
+  "best_params": {
+    "max_leaf_nodes": 63,
+    "max_iter": 600,
+    "learning_rate": 0.03,
+    "l2_regularization": 1.0,
+    "min_samples_leaf": 10
+  },
+  "best_candidate": 9,
+  "candidate_count": 32,
+  "matches_current_final_configuration": true
+}
