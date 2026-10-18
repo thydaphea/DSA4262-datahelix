@@ -44,6 +44,15 @@ uv pip install -r requirements.txt
 
 These steps follow the [uv installation](https://docs.astral.sh/uv/getting-started/installation/), [Python installation](https://docs.astral.sh/uv/guides/install-python/) and [PyTorch CPU installation](https://pytorch.org/get-started/previous-versions/) instructions. On later logins, change to the package directory and activate `.venv` again.
 
+For the existing setup on this machine, installation is already complete. At the start of each new terminal session, run:
+
+```bash
+cd /home/ubuntu/final/final_models
+source .venv/bin/activate
+```
+
+This activates the package's own environment (including NumPy 2.2.6). Its Python interpreter and installed dependencies are separate from `/home/ubuntu/project`. Activation selects the interpreter; it does not retrain or modify models. The independent environment reproduced all five included example predictions exactly. Full results can still vary slightly across library versions or hardware, so use the pinned requirements. The `/home/ubuntu/final` Git checkout is also independent of `/home/ubuntu/project`, while retaining the same GitHub remote and branch `final`.
+
 Saved scikit-learn artifacts record a newer version than the pinned runtime and may issue version warnings. In the tested runtime, all 41,697 saved test predictions were reproduced within numerical precision; see [verification.json](verification.json). Use the pinned dependencies rather than assuming arbitrary versions are compatible.
 
 ## Run the included unlabeled example
@@ -75,10 +84,10 @@ Run these ensemble prediction commands from `~/final/final_models` with your env
 
 ```bash
 # Existing dataset: logistic ensemble
-python predict.py --data ../../project/data/dataset0.json.gz --method ensemble --output predictions/logistic_dataset0.csv
+python predict.py --data raw_datasets/dataset0.json.gz --method ensemble --output predictions/logistic_dataset0.csv
 
 # Existing dataset: weighted-average ensemble
-python predict.py --data ../../project/data/dataset0.json.gz --method weighted --output predictions/weighted_dataset0.csv
+python predict.py --data raw_datasets/dataset0.json.gz --method weighted --output predictions/weighted_dataset0.csv
 
 # New dataset: logistic ensemble
 python predict.py --data /path/to/new_data.json.gz --method ensemble --output predictions/new_logistic.csv
@@ -100,7 +109,7 @@ Each retained site receives a probability between 0 and 1. Larger scores indicat
 
 ### Training and labelled evaluation
 
-Edit [training_inputs.json](training_inputs.json) to specify each dataset's raw JSON and matching label file, plus `splits.csv.gz`. Paths resolve relative to the configuration file. The supplied paths point to `../../project/data/` on this machine.
+Edit [training_inputs.json](training_inputs.json) to specify each dataset's raw JSON and matching label file, plus `splits.csv.gz`. Paths resolve relative to the configuration file. The supplied paths point to `raw_datasets/`, containing the three original compressed JSON datasets and their matching label files on this machine. These raw files are not included in the environment-update commit; teammates must obtain them separately and place them at those paths.
 
 Labels require `transcript_id,transcript_position,label`; `gene_id` is optional. Source fractions in [0,1] become binary labels: **0 → 0; any value > 0 → 1**. Each sample is joined only to its own labels. The split manifest requires `dataset_id,transcript_id,transcript_position,original_split,label,group_id,fold`; development folds are 1–5 and test folds are blank.
 

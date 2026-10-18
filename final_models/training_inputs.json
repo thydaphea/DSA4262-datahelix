@@ -3,18 +3,18 @@
   "datasets": [
     {
       "dataset_id": "dataset0",
-      "data": "../../project/data/dataset0.json.gz",
-      "labels": "../../project/data/data.info.labelled"
+      "data": "raw_datasets/dataset0.json.gz",
+      "labels": "raw_datasets/data.info.labelled"
     },
     {
       "dataset_id": "dataset1",
-      "data": "../../project/data/dataset1.json.gz",
-      "labels": "../../project/data/dataset1.info"
+      "data": "raw_datasets/dataset1.json.gz",
+      "labels": "raw_datasets/dataset1.info"
     },
     {
       "dataset_id": "dataset2",
-      "data": "../../project/data/dataset2.json.gz",
-      "labels": "../../project/data/dataset2.info"
+      "data": "raw_datasets/dataset2.json.gz",
+      "labels": "raw_datasets/dataset2.info"
     }
   ]
 }
