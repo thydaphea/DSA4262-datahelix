@@ -7,6 +7,27 @@ Predict whether an RNA site contains m6A modification from m6Anet-processed dire
 - **`new_train.py`**: additional training entry point with optional gene-grouped split generation and opt-in hyperparameter tuning; `train.py` remains unchanged.
 - **`new_predict.py`**: prediction entry point paired with `new_train.py`, with an explicit `--weights-dir` option for selecting saved models from a training run.
 
+## Quick start: predict on the included sample
+
+Clone the repository, install the pinned dependencies in a Python 3.11 virtual environment, and run the sample through `new_predict.py`:
+
+```bash
+git clone https://github.com/thydaphea/DSA4262-datahelix.git
+cd DSA4262-datahelix/final_models
+python3.11 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/cpu
+python -m pip install -r requirements.txt
+python new_predict.py \
+  --data data/test_sample.jsonl \
+  --output example_results/test_sample_predictions.csv
+```
+
+The prediction CSV will be saved to `final_models/example_results/test_sample_predictions.csv`; its parent folder is created automatically. A companion `test_sample_predictions.audit.json` is written beside it. `new_predict.py` has no fixed output-folder default: the path passed to `--output` determines where results go. The command above writes 300 prediction rows using the bundled model weights; use `--weights-dir PATH` to select another training run's weights.
+
+If `python3.11` is not installed, follow [Install on AWS Ubuntu](#install-on-aws-ubuntu) to create a Python 3.11 environment and install dependencies, then run the prediction command above.
+
 ## Table of contents
 
 - [Install on AWS Ubuntu](#install-on-aws-ubuntu)
