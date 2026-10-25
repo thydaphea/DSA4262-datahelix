@@ -4,12 +4,15 @@ Predict whether an RNA site contains m6A modification from m6Anet-processed dire
 
 - **`train.py`**: clean and join reads/labels, preserve supplied splits, generate five-fold out-of-fold (OOF) predictions, fit final models and ensembles, and evaluate held-out sites.
 - **`predict.py`**: clean unlabeled JSON and produce site probabilities using saved models. It also contains the shared model definitions and preprocessing.
+- **`new_train.py`**: additional training entry point with optional gene-grouped split generation and opt-in hyperparameter tuning; `train.py` remains unchanged.
+- **`new_predict.py`**: prediction entry point paired with `new_train.py`, with an explicit `--weights-dir` option for selecting saved models from a training run.
 
 ## Table of contents
 
 - [Install on AWS Ubuntu](#install-on-aws-ubuntu)
 - [Run the included unlabeled example](#run-the-included-unlabeled-example)
 - [Inputs, execution and outputs](#inputs-execution-and-outputs)
+- [New training and prediction scripts](#new-training-and-prediction-scripts)
 - [Cleaning and models](#cleaning-and-models)
 - [All command-line arguments](#all-command-line-arguments)
 - [Interpret evaluation results](#interpret-evaluation-results)
@@ -118,6 +121,99 @@ python train.py --config training_inputs.json --out-dir results/new_training
 ```
 
 This fits all three base models and both ensembles. The new directory contains the joined cleaned table, fold checkpoints, OOF predictions, final `models/`, test predictions, metrics and provenance. The small unlabeled example is for prediction only; training requires the full labelled development inputs and matching assignments.
+
+## New training and prediction scripts
+
+`new_train.py` and `new_predict.py` are additional scripts. They do not replace or modify `train.py` and `predict.py`.
+
+### Prepare a config for new training data
+
+Create a JSON config with one entry per dataset. Each entry needs a unique `dataset_id`, a raw m6Anet JSON/JSONL path, and a matching labels path. Relative paths resolve from the config file. Labels need `transcript_id`, `transcript_position`, and `label`; `gene_id` is required if the script must generate splits. As in the existing pipeline, labels in `[0,1]` are binarized with `0 → negative` and any value above 0 becoming positive.
+
+For example, save this as `new_training_inputs.json` next to your data files:
+
+```json
+{
+  "datasets": [
+    {
+      "dataset_id": "my_dataset",
+      "data": "raw/my_dataset.json.gz",
+      "labels": "labels/my_dataset.csv"
+    }
+  ]
+}
+```
+
+When reusing an existing split, add a `"splits": "path/to/splits.csv.gz"` entry. That manifest must assign every labelled site to its dataset, split, group and development fold. The script validates and preserves those assignments; it does not revise them to fit new data. If you omit `splits`, `new_train.py` generates one. You can also explicitly request a fresh split with `--generate-splits`, even when the config contains a manifest.
+
+Generated splits require a `gene_id` for every labelled site. The script holds out about one fifth of the gene groups as test data, then assigns the remaining groups to five development folds. Stratification aims to preserve the positive/negative site balance within each dataset, but exact balance is not guaranteed because each gene must stay in one partition. Use `--seed` to reproduce the assignments. Review the generated `splits.csv.gz` before treating its test metrics as final.
+
+### Train with saved settings or opt in to tuning
+
+From the `final_models` directory with the project environment activated, run:
+
+```bash
+# Use saved settings; preserve a supplied manifest or generate splits if omitted
+python new_train.py --config new_training_inputs.json --out-dir results/my_run
+
+# Generate gene-grouped splits and opt in to hyperparameter tuning
+python new_train.py --config new_training_inputs.json --out-dir results/my_tuned_run --generate-splits --tune
+
+# Check data cleaning and split/label compatibility without fitting models
+python new_train.py --config new_training_inputs.json --out-dir results/preflight --prepare-only
+```
+
+Tuning is off unless `--tune` is present. The opt-in search tries 32 GB candidates, screens 12 MLP candidates and refines the strongest candidates, and evaluates 17 GRU candidates over five gene-grouped development folds. GB and MLP use the configured validation split when available, otherwise development fold 5. The held-out test set is excluded from model selection. Search settings and results are saved in `selected_configurations.json` and `tuning_history.json`; without tuning, the saved MLP, GB and GRU configurations are used.
+
+The output directory must not already exist. It contains the resolved config, cleaned data and audit, fold and final model weights, OOF predictions, test predictions and metrics, and a run manifest. A generated split is saved as `splits.csv.gz`. Training needs labeled data; the small unlabeled example is not sufficient. If gene IDs are missing, use a supplied manifest with explicit group assignments or resolve the gene annotations before generating splits.
+
+### Predict with bundled or newly trained weights
+
+`new_predict.py` uses the package's bundled `models/` by default:
+
+```bash
+python new_predict.py --data /path/to/unlabeled_data.json.gz --output predictions/predictions.csv
+```
+
+[data/test_sample.jsonl](data/test_sample.jsonl) is a ready-to-run example with 300 raw sites sampled from the held-out test assignments (100 from each of datasets 0, 1 and 2). It contains no labels; see [its provenance record](data/test_sample_provenance.json). Run it with the bundled weights:
+
+```bash
+python new_predict.py --data data/test_sample.jsonl --output example_results/test_sample_predictions.csv
+```
+
+The output should contain one scored row per retained site, plus a neighbouring audit file. This sample demonstrates prediction output only; it is not a benchmark and its hidden labels are not provided.
+
+To use weights from a new training run, point `--weights-dir` to that run's `models/` directory:
+
+```bash
+python new_predict.py \
+  --data /path/to/unlabeled_data.json.gz \
+  --weights-dir results/my_run/models \
+  --method ensemble \
+  --output predictions/my_run_predictions.csv
+```
+
+`--model-dir` is also accepted as an alias for `--weights-dir`. The selected model folder must contain the requested artifacts. Ensemble prediction requires `gru/`, `mlp/`, `gb/`, and `ensemble/oof_holdout/`; individual `gru`, `mlp`, or `gb` prediction needs only that model's folder. Prediction data can be unlabeled and uses the same cleaning and output format described above.
+
+### New script arguments
+
+Both scripts accept `-h` / `--help`. The main options are:
+
+| Script | Argument | Meaning | Default |
+|---|---|---|---|
+| `new_train.py` | `--config PATH` | JSON listing datasets, raw data, labels and an optional split manifest | `training_inputs.json` |
+| `new_train.py` | `--out-dir PATH` | New run directory; must not already exist | Required |
+| `new_train.py` | `--generate-splits` | Generate a new gene-grouped test split and five development folds, even if a manifest is configured | Off |
+| `new_train.py` | `--tune` | Opt in to GB, MLP and GRU hyperparameter searches | Off |
+| `new_train.py` | `--prepare-only` | Clean/join data and verify assignments without fitting models | Off |
+| `new_train.py` | `--methods NAME ...` | One or more of `mlp`, `gb`, `gru` | All three |
+| `new_train.py` | `--skip-ensemble` | Skip ensemble fitting | Off |
+| `new_train.py` | `--seed N`, `--threads N` | Random seed and positive CPU thread count | `42`, `1` |
+| `new_predict.py` | `--data PATH` | Raw JSONL or JSONL.gz to predict | Required |
+| `new_predict.py` | `--output PATH` | New prediction CSV path | Required |
+| `new_predict.py` | `--weights-dir PATH` | Folder containing a training run's model subfolders (`--model-dir` is an alias) | Package `models/` |
+| `new_predict.py` | `--method NAME` | `ensemble`, `weighted`, `mlp`, `gb` or `gru` | `ensemble` |
+| `new_predict.py` | `--threads N` | Positive CPU thread count | `1` |
 
 ## Cleaning and models
 
