@@ -562,7 +562,7 @@ def ensemble_fit(oof, out):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--config',type=Path,default=ROOT/'training_inputs.json',help='JSON listing raw data and labels, plus an optional split manifest')
+    parser.add_argument('--config',type=Path,default=ROOT/'training_data'/'training_inputs.json',help='JSON listing raw data and labels, plus an optional split manifest')
     parser.add_argument('--out-dir',type=Path,required=True,help='New output directory; existing results are never overwritten')
     parser.add_argument('--prepare-only',action='store_true',help='Only produce joined cleaned sites and verify all assignments')
     parser.add_argument('--methods',nargs='+',choices=['mlp','gb','gru'],default=['mlp','gb','gru'])

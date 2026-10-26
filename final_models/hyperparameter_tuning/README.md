@@ -11,7 +11,7 @@ This directory contains GB/MLP source snapshots and saved search results copied 
 - `mlp/`: original per-epoch tuning history, selected-run validation history, metrics/settings, selected configuration and candidate/stage summary CSV.
 - `mlp/additional_experiments/`: selection records and validation histories for subsequent dropout, positive-loss-weight and epoch comparisons.
 - `gru/`: historical configuration selection, selected settings, final-fit summary, subsequent OOF run manifest and source hashes; see [GRU evidence and limitations](gru/README.md). The full candidate search history is unavailable.
-- `original_split_manifest.csv`: original train/validation/test assignments shared by GB and MLP. This is historical evidence, not a replacement for `../splits.csv.gz` and its preserved five OOF folds.
+- `original_split_manifest.csv`: original train/validation/test assignments shared by GB and MLP. This is historical evidence, not a replacement for `../training_data/splits.csv.gz` and its preserved five OOF folds.
 - `provenance.json`: original file paths and SHA-256 hashes of the exact copied files.
 
 The source files are snapshots of the project files available when this evidence was assembled. The project code evolved after earlier experiments; saved histories are the record of the completed runs. This does not claim every current source byte is identical to the code used at the original run date.
