@@ -122,7 +122,7 @@ python predict.py \
 
 ### 2.3 Prediction Outputs
 
-The prediction CSV contains three columns:
+The prediction CSV contains one row per transcript position, with three columns:
 
 | Column | Description |
 | --- | --- |
@@ -130,7 +130,22 @@ The prediction CSV contains three columns:
 | `transcript_position` | Position within the transcript |
 | `score` | Predicted probability of m6A modification (0–1) |
 
-Higher scores indicate stronger predicted evidence of m6A modification. Scores are not modification fractions or per-read predictions, and no binary classification threshold is applied.
+**Interpreting Prediction Scores**
+
+The score represents the model's estimated likelihood that a transcript position contains an m6A modification, based on its RNA sequence and nanopore signal measurements.
+Higher scores indicate stronger predicted evidence of m6A modification.
+
+**Important Considerations**
+
+- Site-level predictions: Each score corresponds to a transcript position, not an individual sequencing read.
+
+- Not modification fractions: A score of 0.92 does not mean that 92% of RNA molecules are modified at that position.
+
+- No predefined classification threshold: The software outputs continuous scores rather than assigning modified/unmodified labels.
+
+- Relative prioritisation: Users can rank transcript positions by score to identify candidate m6A sites for further investigation or experimental validation.
+
+- Model uncertainty: Scores are model estimates, not experimental confirmation of m6A modification. Their numerical values should not be interpreted as calibrated probabilities unless calibration has been established.
 
 
 ## 3. Training New Models
@@ -171,7 +186,7 @@ Fractional modification labels are converted to binary labels: 0 remains 0, whil
 
 Use --seed 42 when generating new splits to ensure reproducible train, validation and test assignments. If an existing split manifest is supplied, its assignments are preserved.
 
-Case 1: Train using the saved model configurations:
+**Case 1: Train using the saved model configurations:**
 
 ```bash
 python train.py \
@@ -179,7 +194,7 @@ python train.py \
   --out-dir results/my_run
 ```
 
-Case 2: Use supplied splits:
+**Case 2: Use supplied splits:**
 
 Add a matching manifest to the configuration:
 
@@ -198,7 +213,7 @@ Add a matching manifest to the configuration:
 
 Run the same training command used in Case 1.
 
-Case 3: To generate new grouped splits and perform hyperparameter tuning:
+**Case 3: To generate new grouped splits and perform hyperparameter tuning:**
 
 ```bash
 python train.py \
