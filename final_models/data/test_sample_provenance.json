@@ -1,5 +1,5 @@
 {
-  "purpose": "Unlabeled example input for new_predict.py; not an accuracy benchmark.",
+  "purpose": "Unlabeled example input for predict.py; not an accuracy benchmark.",
   "site_count": 300,
   "sites_per_dataset": {
     "dataset0": 100,

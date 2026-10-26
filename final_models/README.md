@@ -1,15 +1,13 @@
 # DataHelix: m6A site prediction
 
-Predict whether an RNA site contains m6A modification from m6Anet-processed direct RNA-sequencing reads. One shared set of GB, MLP and GRU models serves all datasets; the default output combines their probabilities with a logistic ensemble.
+Predict whether an RNA site contains m6A modification from m6Anet-processed direct RNA-sequencing reads. One shared set of GB, MLP and GRU models serves all datasets; the ensemble combines their probabilities with logistic regression.
 
-- **`train.py`**: clean and join reads/labels, preserve supplied splits, generate five-fold out-of-fold (OOF) predictions, fit final models and ensembles, and evaluate held-out sites.
-- **`predict.py`**: clean unlabeled JSON and produce site probabilities using saved models. It also contains the shared model definitions and preprocessing.
-- **`new_train.py`**: additional training entry point with optional gene-grouped split generation and opt-in hyperparameter tuning; `train.py` remains unchanged.
-- **`new_predict.py`**: prediction entry point paired with `new_train.py`, with an explicit `--weights-dir` option for selecting saved models from a training run.
+- **`train.py`**: clean and join reads/labels, preserve supplied splits or generate gene-grouped splits, optionally tune hyperparameters, generate five-fold out-of-fold (OOF) predictions, fit final models and the logistic ensemble, and evaluate held-out sites.
+- **`predict.py`**: clean unlabeled JSON and produce site probabilities using bundled or newly trained models. It also contains the shared model definitions and preprocessing, including the GRU variants used during tuning.
 
 ## Quick start: predict on the included sample
 
-Clone the repository, install the pinned dependencies in a Python 3.11 virtual environment, and run the sample through `new_predict.py`:
+Clone the repository, install the pinned dependencies in a Python 3.11 virtual environment, and run the sample through `predict.py`:
 
 ```bash
 git clone https://github.com/thydaphea/DSA4262-datahelix.git
@@ -19,12 +17,12 @@ source .venv/bin/activate
 python -m pip install --upgrade pip
 python -m pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/cpu
 python -m pip install -r requirements.txt
-python new_predict.py \
+python predict.py \
   --data data/test_sample.jsonl \
   --output example_results/test_sample_predictions.csv
 ```
 
-The prediction CSV will be saved to `final_models/example_results/test_sample_predictions.csv`; its parent folder is created automatically. A companion `test_sample_predictions.audit.json` is written beside it. `new_predict.py` has no fixed output-folder default: the path passed to `--output` determines where results go. The command above writes 300 prediction rows using the bundled model weights; use `--weights-dir PATH` to select another training run's weights.
+The prediction CSV will be saved to `final_models/example_results/test_sample_predictions.csv`; its parent folder is created automatically. A companion `test_sample_predictions.audit.json` is written beside it. `predict.py` has no fixed output-folder default: the path passed to `--output` determines where results go. The command above writes 300 prediction rows using the bundled model weights; use `--weights-dir PATH` to select another training run's weights.
 
 If `python3.11` is not installed, follow [Install on AWS Ubuntu](#install-on-aws-ubuntu) to create a Python 3.11 environment and install dependencies, then run the prediction command above.
 
@@ -33,7 +31,7 @@ If `python3.11` is not installed, follow [Install on AWS Ubuntu](#install-on-aws
 - [Install on AWS Ubuntu](#install-on-aws-ubuntu)
 - [Run the included unlabeled example](#run-the-included-unlabeled-example)
 - [Inputs, execution and outputs](#inputs-execution-and-outputs)
-- [New training and prediction scripts](#new-training-and-prediction-scripts)
+- [Split generation, tuning and custom weights](#split-generation-tuning-and-custom-weights)
 - [Cleaning and models](#cleaning-and-models)
 - [All command-line arguments](#all-command-line-arguments)
 - [Interpret evaluation results](#interpret-evaluation-results)
@@ -110,17 +108,11 @@ Run these ensemble prediction commands from `~/final/final_models` with your env
 # Existing dataset: logistic ensemble
 python predict.py --data raw_datasets/dataset0.json.gz --method ensemble --output predictions/logistic_dataset0.csv
 
-# Existing dataset: weighted-average ensemble
-python predict.py --data raw_datasets/dataset0.json.gz --method weighted --output predictions/weighted_dataset0.csv
-
 # New dataset: logistic ensemble
 python predict.py --data /path/to/new_data.json.gz --method ensemble --output predictions/new_logistic.csv
-
-# New dataset: weighted-average ensemble
-python predict.py --data /path/to/new_data.json.gz --method weighted --output predictions/new_weighted.csv
 ```
 
-For dataset1 or dataset2, change both the input and output filenames. Both methods reuse the saved models in `models/` without retraining. To use a completed new training run, add `--model-dir results/new_training/models`.
+For dataset1 or dataset2, change both the input and output filenames. These commands reuse the saved models in `models/` without retraining. To use a completed new training run, add `--model-dir results/new_training/models`.
 
 Output is exactly three comma-separated columns:
 
@@ -133,7 +125,7 @@ Each retained site receives a probability between 0 and 1. Larger scores indicat
 
 ### Training and labelled evaluation
 
-Edit [training_inputs.json](training_inputs.json) to specify each dataset's raw JSON and matching label file, plus `splits.csv.gz`. Paths resolve relative to the configuration file. The supplied paths point to `raw_datasets/`, containing the three original compressed JSON datasets and their matching label files on this machine. These raw files are not included in the environment-update commit; teammates must obtain them separately and place them at those paths.
+Edit [training_inputs.json](training_inputs.json) to specify each dataset's raw JSON and matching label file, plus an optional split manifest such as `splits.csv.gz`. If no manifest is supplied, gene-grouped splits are generated and labels must include `gene_id`. Paths resolve relative to the configuration file. The supplied paths point to `raw_datasets/`, containing the three original compressed JSON datasets and their matching label files on this machine. These raw files are not included in the environment-update commit; teammates must obtain them separately and place them at those paths.
 
 Labels require `transcript_id,transcript_position,label`; `gene_id` is optional. Source fractions in [0,1] become binary labels: **0 → 0; any value > 0 → 1**. Each sample is joined only to its own labels. The split manifest requires `dataset_id,transcript_id,transcript_position,original_split,label,group_id,fold`; development folds are 1–5 and test folds are blank.
 
@@ -141,11 +133,11 @@ Labels require `transcript_id,transcript_position,label`; `gene_id` is optional.
 python train.py --config training_inputs.json --out-dir results/new_training
 ```
 
-This fits all three base models and both ensembles. The new directory contains the joined cleaned table, fold checkpoints, OOF predictions, final `models/`, test predictions, metrics and provenance. The small unlabeled example is for prediction only; training requires the full labelled development inputs and matching assignments.
+This fits all three base models and the logistic regression ensemble. The new directory contains the joined cleaned table, fold checkpoints, OOF predictions, final `models/`, test predictions, metrics and provenance. The small unlabeled example is for prediction only; training requires the full labelled development inputs and matching assignments.
 
-## New training and prediction scripts
+## Split generation, tuning and custom weights
 
-`new_train.py` and `new_predict.py` are additional scripts. They do not replace or modify `train.py` and `predict.py`.
+Use `train.py` for training and `predict.py` for prediction. Training supports optional gene-grouped split generation and hyperparameter tuning; prediction supports all GRU variants produced by tuning.
 
 ### Prepare a config for new training data
 
@@ -165,7 +157,7 @@ For example, save this as `new_training_inputs.json` next to your data files:
 }
 ```
 
-When reusing an existing split, add a `"splits": "path/to/splits.csv.gz"` entry. That manifest must assign every labelled site to its dataset, split, group and development fold. The script validates and preserves those assignments; it does not revise them to fit new data. If you omit `splits`, `new_train.py` generates one. You can also explicitly request a fresh split with `--generate-splits`, even when the config contains a manifest.
+When reusing an existing split, add a `"splits": "path/to/splits.csv.gz"` entry. That manifest must assign every labelled site to its dataset, split, group and development fold. The script validates and preserves those assignments; it does not revise them to fit new data. If you omit `splits`, `train.py` generates one. You can also explicitly request a fresh split with `--generate-splits`, even when the config contains a manifest.
 
 Generated splits require a `gene_id` for every labelled site. The script holds out about one fifth of the gene groups as test data, then assigns the remaining groups to five development folds. Stratification aims to preserve the positive/negative site balance within each dataset, but exact balance is not guaranteed because each gene must stay in one partition. Use `--seed` to reproduce the assignments. Review the generated `splits.csv.gz` before treating its test metrics as final.
 
@@ -175,13 +167,13 @@ From the `final_models` directory with the project environment activated, run:
 
 ```bash
 # Use saved settings; preserve a supplied manifest or generate splits if omitted
-python new_train.py --config new_training_inputs.json --out-dir results/my_run
+python train.py --config new_training_inputs.json --out-dir results/my_run
 
 # Generate gene-grouped splits and opt in to hyperparameter tuning
-python new_train.py --config new_training_inputs.json --out-dir results/my_tuned_run --generate-splits --tune
+python train.py --config new_training_inputs.json --out-dir results/my_tuned_run --generate-splits --tune
 
 # Check data cleaning and split/label compatibility without fitting models
-python new_train.py --config new_training_inputs.json --out-dir results/preflight --prepare-only
+python train.py --config new_training_inputs.json --out-dir results/preflight --prepare-only
 ```
 
 Tuning is off unless `--tune` is present. The opt-in search tries 32 GB candidates, screens 12 MLP candidates and refines the strongest candidates, and evaluates 17 GRU candidates over five gene-grouped development folds. GB and MLP use the configured validation split when available, otherwise development fold 5. The held-out test set is excluded from model selection. Search settings and results are saved in `selected_configurations.json` and `tuning_history.json`; without tuning, the saved MLP, GB and GRU configurations are used.
@@ -190,16 +182,16 @@ The output directory must not already exist. It contains the resolved config, cl
 
 ### Predict with bundled or newly trained weights
 
-`new_predict.py` uses the package's bundled `models/` by default:
+`predict.py` uses the package's bundled `models/` by default:
 
 ```bash
-python new_predict.py --data /path/to/unlabeled_data.json.gz --output predictions/predictions.csv
+python predict.py --data /path/to/unlabeled_data.json.gz --output predictions/predictions.csv
 ```
 
 [data/test_sample.jsonl](data/test_sample.jsonl) is a ready-to-run example with 300 raw sites sampled from the held-out test assignments (100 from each of datasets 0, 1 and 2). It contains no labels; see [its provenance record](data/test_sample_provenance.json). Run it with the bundled weights:
 
 ```bash
-python new_predict.py --data data/test_sample.jsonl --output example_results/test_sample_predictions.csv
+python predict.py --data data/test_sample.jsonl --output example_results/test_sample_predictions.csv
 ```
 
 The output should contain one scored row per retained site, plus a neighbouring audit file. This sample demonstrates prediction output only; it is not a benchmark and its hidden labels are not provided.
@@ -207,7 +199,7 @@ The output should contain one scored row per retained site, plus a neighbouring 
 To use weights from a new training run, point `--weights-dir` to that run's `models/` directory:
 
 ```bash
-python new_predict.py \
+python predict.py \
   --data /path/to/unlabeled_data.json.gz \
   --weights-dir results/my_run/models \
   --method ensemble \
@@ -215,26 +207,6 @@ python new_predict.py \
 ```
 
 `--model-dir` is also accepted as an alias for `--weights-dir`. The selected model folder must contain the requested artifacts. Ensemble prediction requires `gru/`, `mlp/`, `gb/`, and `ensemble/oof_holdout/`; individual `gru`, `mlp`, or `gb` prediction needs only that model's folder. Prediction data can be unlabeled and uses the same cleaning and output format described above.
-
-### New script arguments
-
-Both scripts accept `-h` / `--help`. The main options are:
-
-| Script | Argument | Meaning | Default |
-|---|---|---|---|
-| `new_train.py` | `--config PATH` | JSON listing datasets, raw data, labels and an optional split manifest | `training_inputs.json` |
-| `new_train.py` | `--out-dir PATH` | New run directory; must not already exist | Required |
-| `new_train.py` | `--generate-splits` | Generate a new gene-grouped test split and five development folds, even if a manifest is configured | Off |
-| `new_train.py` | `--tune` | Opt in to GB, MLP and GRU hyperparameter searches | Off |
-| `new_train.py` | `--prepare-only` | Clean/join data and verify assignments without fitting models | Off |
-| `new_train.py` | `--methods NAME ...` | One or more of `mlp`, `gb`, `gru` | All three |
-| `new_train.py` | `--skip-ensemble` | Skip ensemble fitting | Off |
-| `new_train.py` | `--seed N`, `--threads N` | Random seed and positive CPU thread count | `42`, `1` |
-| `new_predict.py` | `--data PATH` | Raw JSONL or JSONL.gz to predict | Required |
-| `new_predict.py` | `--output PATH` | New prediction CSV path | Required |
-| `new_predict.py` | `--weights-dir PATH` | Folder containing a training run's model subfolders (`--model-dir` is an alias) | Package `models/` |
-| `new_predict.py` | `--method NAME` | `ensemble`, `weighted`, `mlp`, `gb` or `gru` | `ensemble` |
-| `new_predict.py` | `--threads N` | Positive CPU thread count | `1` |
 
 ## Cleaning and models
 
@@ -294,15 +266,15 @@ Each of the 45 signal summaries and log coverage is standardized using only fitt
 
 **Tuning:** the preserved [configuration-selection record](hyperparameter_tuning/gru/configuration_selection.json) specifies selection by mean fold trapezoidal PR-AUC, followed by ROC-AUC and weight-decay tie-breaks. It records a 50-epoch tuning limit, patience 5 and minimum improvement 0.001; the final duration was set to the rounded median best epoch across folds, **32 epochs**. The [final fit summary](models/gru/fit_summary.json) confirms 32 epochs and positive-class weight 1. Although the historical configuration has `class_weighting: true`, its `alpha: 0` gave no effective positive-class upweighting.
 
-The available GRU records do not include the full candidate grid or per-candidate scores, so the tested ranges and number of trials cannot be verified. The current `train.py` reuses the selected configuration for all five OOF fits and the final refit, with exactly 32 epochs and no early stopping; it does not repeat the historical search.
+The available GRU records do not include the full candidate grid or per-candidate scores, so the tested ranges and number of trials cannot be verified. By default, `train.py` reuses the selected configuration for all five OOF fits and the final refit, with exactly 32 epochs and no early stopping. With `--tune`, it runs the 17-candidate search described above, including early stopping within each development fold; the selected final duration is the median best epoch across folds. This current search does not reconstruct the unavailable historical candidate records.
 
-### Splits, tuning and ensembles
+### Splits, tuning and the ensemble
 
 The supplied manifest preserves **172,274 original training + validation sites** and **41,697 test sites**, including all five grouped fold assignments. Grouping links genes/transcripts across dataset0/1 and matching mixture positions in dataset2. Each base model trains on four folds and predicts the fifth; normalizers use only fitting rows. Final base models are then fitted on all original training + validation sites.
 
-All three base-model configurations are fixed in the current pipeline. GB/MLP search histories and GRU selection evidence are in [hyperparameter_tuning/](hyperparameter_tuning/README.md): GB tested 32 candidates; MLP screened 12 and trained three finalists longer; GRU selected settings by mean fold trapezoidal PR-AUC and used 32 final epochs. GRU's retained selection and fitting records are in [gru/](hyperparameter_tuning/gru/README.md). 
+Without `--tune`, all three base-model configurations use the saved settings; `--tune` selects settings using development data only. GB/MLP search histories and GRU selection evidence are in [hyperparameter_tuning/](hyperparameter_tuning/README.md): GB tested 32 candidates; MLP screened 12 and trained three finalists longer; GRU selected settings by mean fold trapezoidal PR-AUC and used 32 final epochs. GRU's retained selection and fitting records are in [gru/](hyperparameter_tuning/gru/README.md).
 
-The ensembles use the three OOF probabilities. OOF folds 1–4 select/fit ensemble settings; fold 5 validates them. The saved weighted ensemble uses GRU/MLP/GB weights **0.44/0.40/0.16**. The default logistic ensemble uses raw probabilities and clipped logits, standardized before binary logistic regression. Both are applied to final-model test probabilities without an all-OOF refit. Ensemble selection uses mean trapezoidal PR-AUC, with ROC-AUC breaking ties. Historical tuning and OOF ensemble validation are not fully nested.
+The logistic regression ensemble uses the three OOF probabilities. OOF folds 1–4 select/fit ensemble settings; fold 5 validates them. The saved logistic ensemble uses raw probabilities and clipped logits, standardized before binary logistic regression. It is applied to final-model test probabilities without an all-OOF refit. Ensemble selection uses mean trapezoidal PR-AUC, with ROC-AUC breaking ties. Historical tuning and OOF ensemble validation are not fully nested.
 
 ## All command-line arguments
 
@@ -314,27 +286,29 @@ Both scripts accept `-h` / `--help` to display usage.
 |---|---|---|
 | `--data PATH` | Raw JSONL or JSONL.gz | Required |
 | `--output PATH` | New prediction CSV; parent directories created automatically | Required |
-| `--model-dir PATH` | Directory containing saved model subfolders | Package `models/` |
-| `--method NAME` | `ensemble` (logistic), `weighted`, `mlp`, `gb` or `gru` | `ensemble` |
+| `--weights-dir PATH`, `--model-dir PATH` | Directory containing saved model subfolders (aliases) | Package `models/` |
+| `--method NAME` | `ensemble` (logistic regression), `mlp`, `gb` or `gru` | `ensemble` |
 | `--threads N` | Positive CPU thread count | `1` |
 
 ### `train.py`
 
 | Argument | Meaning | Default |
 |---|---|---|
-| `--config PATH` | JSON listing raw data, labels and split manifest | Package `training_inputs.json` |
+| `--config PATH` | JSON listing raw data, labels and an optional split manifest | Package `training_inputs.json` |
 | `--out-dir PATH` | New run directory; must not already exist | Required |
+| `--generate-splits` | Generate a new gene-grouped test split and five development folds, even if a manifest is configured | Off; generated automatically if no manifest is supplied |
+| `--tune` | Run GB, MLP and GRU hyperparameter searches on development data | Off |
 | `--prepare-only` | Clean/join data and verify assignments without model fitting | Off |
 | `--methods NAME ...` | One or more of `mlp`, `gb`, `gru` | All three |
-| `--skip-ensemble` | Skip ensemble fitting; otherwise ensembles require all three base models | Off |
+| `--skip-ensemble` | Skip logistic ensemble fitting; otherwise all three base models are required | Off |
 | `--threads N` | Positive CPU thread count | `1` |
 | `--seed N` | Random seed; neural fold fits use seed + fold, final fits use seed | `42` |
 
-Architecture and optimizer settings are fixed constants in `train.py`, not additional CLI arguments.
+Default architecture and optimizer settings are constants in `train.py`; `--tune` searches candidate settings and saves the selected configurations. These settings are not separate CLI arguments.
 
 ## Interpret evaluation results
 
-[results/test/test_metrics.csv](results/test/test_metrics.csv) contains preserved per-dataset and pooled test results; a new run writes `evaluation_metrics.csv`. PR-AUC uses trapezoidal integration; average precision (AP) is separate. ROC-AUC and PR-AUC evaluate probability rankings across thresholds. Pooled metrics combine all test predictions, rather than averaging dataset scores. All test metrics are unweighted.
+[results/test/test_metrics.csv](results/test/test_metrics.csv) contains preserved per-dataset and pooled test results; a new run writes `evaluation_metrics.csv`. PR-AUC uses trapezoidal integration; average precision (AP) is separate. ROC-AUC and PR-AUC evaluate probability rankings across thresholds. Pooled metrics combine all test predictions, rather than averaging dataset scores. All test metrics are unweighted. Preserved evaluation records include the former weighted-average baseline for historical comparison; current training and prediction support logistic regression as the only ensemble.
 
 The saved logistic ensemble achieved pooled **PR-AUC 0.527054** and **ROC-AUC 0.896287**. `results/test/dataset*_heldout_predictions.csv` contains its test-only predictions. The included unlabeled example cannot measure accuracy, PR-AUC or ROC-AUC. Existing results are internal held-out evaluations on previously explored datasets, not independent external validation.
 

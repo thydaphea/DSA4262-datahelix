@@ -140,15 +140,27 @@ def transform(frame, preprocessing):
     return seq, aux
 
 class SiteGRU(nn.Module):
-    def __init__(self, hidden_size=32, dropout=0.0):
+    def __init__(self, hidden_size=32, dropout=0.0, bidirectional=False,
+                 all_position_outputs=False, head_size=32):
         super().__init__()
-        self.gru = nn.GRU(input_size=15, hidden_size=hidden_size, batch_first=True)
-        self.head = nn.Sequential(nn.Linear(hidden_size + 29, 32), nn.ReLU(),
-                                  nn.Dropout(dropout), nn.Linear(32, 1))
+        self.bidirectional = bool(bidirectional)
+        self.all_position_outputs = bool(all_position_outputs)
+        self.gru = nn.GRU(input_size=15, hidden_size=hidden_size, batch_first=True,
+                          bidirectional=self.bidirectional)
+        direction_count = 2 if self.bidirectional else 1
+        recurrent_width = hidden_size * direction_count * (3 if self.all_position_outputs else 1)
+        self.head = nn.Sequential(nn.Linear(recurrent_width + 29, head_size), nn.ReLU(),
+                                  nn.Dropout(dropout), nn.Linear(head_size, 1))
 
     def forward(self, seq, aux):
-        _, hidden = self.gru(seq)
-        return self.head(torch.cat([hidden[-1], aux], dim=1)).squeeze(1)
+        outputs, hidden = self.gru(seq)
+        if self.all_position_outputs:
+            recurrent = outputs.reshape(outputs.shape[0], -1)
+        elif self.bidirectional:
+            recurrent = torch.cat([hidden[-2], hidden[-1]], dim=1)
+        else:
+            recurrent = hidden[-1]
+        return self.head(torch.cat([recurrent, aux], dim=1)).squeeze(1)
 
 def loader(seq, aux, batch_size, labels=None, shuffle=False, seed=42):
     tensors = [torch.from_numpy(seq), torch.from_numpy(aux)]
@@ -268,14 +280,20 @@ def transform_scores(x, representation):
 
 
 def load_models(model_dir, method):
+    if method not in ('ensemble', 'mlp', 'gb', 'gru'):
+        raise ValueError(f'Unknown prediction method: {method}')
     root = Path(model_dir)
     result = {}
-    names = ['gru', 'mlp', 'gb'] if method in ('ensemble', 'weighted') else [method]
+    names = ['gru', 'mlp', 'gb'] if method == 'ensemble' else [method]
     for name in names:
         if name == 'gru':
             directory = root / 'gru'
             state = torch.load(directory / 'model.pt', map_location='cpu', weights_only=True)
-            model = SiteGRU(state['config']['hidden_size'], state['config']['dropout'])
+            config = state['config']
+            model = SiteGRU(config['hidden_size'], config['dropout'],
+                            bidirectional=config.get('bidirectional', False),
+                            all_position_outputs=config.get('all_position_outputs', False),
+                            head_size=config.get('head_size', 32))
             model.load_state_dict(state['state_dict'])
             prep = json.loads((directory / 'preprocessing.json').read_text())
             result[name] = (model.eval(), prep)
@@ -291,11 +309,6 @@ def load_models(model_dir, method):
         result['ensemble'] = joblib.load(root / 'ensemble/oof_holdout/logistic_regression.joblib')
         if result['ensemble']['feature_order'] != SCORE_COLUMNS:
             raise ValueError('Ensemble feature order mismatch')
-    if method == 'weighted':
-        result['weighted'] = np.asarray(json.loads((root / 'ensemble/oof_holdout/weighted_average.json').read_text())['weights'])
-        w = result['weighted']
-        if w.shape != (3,) or not np.isfinite(w).all() or (w < 0).any() or not np.isclose(w.sum(), 1):
-            raise ValueError('Invalid ensemble weights')
     return result
 
 
@@ -317,20 +330,17 @@ def score_frame(frame, models, method):
             model, prep = models[name]
             arrays = transform(frame, prep)
             scores[name] = np.concatenate([torch.sigmoid(model(s, a)).numpy() for s, a in loader(*arrays, 1024)])
-    if method in ('weighted', 'ensemble'):
+    if method == 'ensemble':
         base = np.column_stack([scores[n] for n in ('gru', 'mlp', 'gb')])
-        if method == 'weighted':
-            output = base @ models['weighted']
-        else:
-            bundle = models['ensemble']
-            # Binary logistic formula avoids version-specific predict_proba attributes.
-            pipeline = bundle['pipeline']
-            scaler, logistic = pipeline.steps[0][1], pipeline.steps[-1][1]
-            if not np.array_equal(logistic.classes_, [0, 1]) or logistic.coef_.shape[0] != 1:
-                raise ValueError('Expected a binary logistic ensemble with classes [0,1]')
-            z = transform_scores(base, bundle['config']['representation'])
-            z = (z - scaler.mean_) / scaler.scale_
-            output = expit(z @ logistic.coef_[0] + logistic.intercept_[0])
+        bundle = models['ensemble']
+        # Binary logistic formula avoids version-specific predict_proba attributes.
+        pipeline = bundle['pipeline']
+        scaler, logistic = pipeline.steps[0][1], pipeline.steps[-1][1]
+        if not np.array_equal(logistic.classes_, [0, 1]) or logistic.coef_.shape[0] != 1:
+            raise ValueError('Expected a binary logistic ensemble with classes [0,1]')
+        z = transform_scores(base, bundle['config']['representation'])
+        z = (z - scaler.mean_) / scaler.scale_
+        output = expit(z @ logistic.coef_[0] + logistic.intercept_[0])
     else:
         output = scores[method]
     if not np.isfinite(output).all() or ((output < 0) | (output > 1)).any():
@@ -383,8 +393,10 @@ def predict_file(data, model_dir, output, method='ensemble', threads=1):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--data', required=True, type=Path, help='Raw m6Anet JSONL or JSONL.gz, any filename')
-    parser.add_argument('--model-dir', type=Path, default=ROOT/'models')
-    parser.add_argument('--method', choices=['ensemble','weighted','mlp','gb','gru'], default='ensemble')
+    parser.add_argument('--weights-dir', '--model-dir', dest='model_dir', type=Path,
+                        default=ROOT/'models',
+                        help='Folder containing gru/, mlp/, gb/ and ensemble/ weights; defaults to this package\'s models/')
+    parser.add_argument('--method', choices=['ensemble','mlp','gb','gru'], default='ensemble')
     parser.add_argument('--output', required=True, type=Path, help='CSV, e.g. datahelix_dataset0.csv')
     parser.add_argument('--threads', type=int, default=1)
     args = parser.parse_args()
