@@ -67,7 +67,7 @@ python predict.py \
   --output example_results/test_sample_predictions.csv
 ```
 
-This generates site-level m6A modification probabilities using the bundled logistic regression ensemble.
+This generates site-level m6A modification probabilities using the pretrained logistic regression stacking ensemble.
 
 The outputs are saved as:
 
@@ -106,9 +106,7 @@ python predict.py \
   --method ensemble \
   --output predictions/new_logistic.csv
 ```
-This command uses the pretrained logistic regression ensemble model in the default `models/` directory.
-
-Saved model files are `models/gb/model.joblib` (GB), `models/mlp/model.joblib` (MLP), and `models/gru/model.pt` (GRU, with `preprocessing.json` alongside it). Logistic Regression ensemble settings are saved in `models/ensemble/logistic_regression.joblib`. 
+This command uses the pretrained logistic regression stacking ensemble saved at `models/ensemble/logistic_regression.joblib`.
 
 To use models from a separate training run, specify the model directory using `--model-dir`:
 
@@ -175,28 +173,36 @@ Label files must contain `transcript_id`, `transcript_position` and `label`. A `
 
 Fractional modification labels are converted to binary labels: 0 remains 0, while any value greater than 0 becomes 1.
 
-
 ### 3.2 Run Model Training
+
+The training pipeline produces cleaned data, model checkpoints, out-of-fold predictions, final model weights, test predictions, evaluation metrics and provenance records.
+
+The training pipeline supports the following split configurations:
 
 | Configuration | Split behaviour |
 |---|---|
-| No `"splits"` entry | Automatically generates gene-grouped splits |
-| Includes `"splits": "path/to/new_splits.csv.gz"` | Preserves the supplied assignments |
-| Pass `--generate-splits` | Generates new splits saved as splits.csv.gz inside the output directory even if a manifest is configured |
+| No `"splits"` entry | Automatically generates gene-grouped train, validation, and test splits |
+| Includes `"splits": "path/to/new_splits.csv.gz"` | Reuses the assignments in the supplied split manifest |
+| Pass `--generate-splits` | Generates new grouped splits, even if a split manifest is specified in the configuration |
 
-Use --seed 42 when generating new splits to ensure reproducible train, validation and test assignments. If an existing split manifest is supplied, its assignments are preserved.
+When generating new splits, use `--seed 42` to ensure reproducible assignments. If an existing split manifest is supplied without `--generate-splits`, its assignments are preserved.
 
-**Case 1: Train using the saved model configurations:**
+#### Case 1: Train with Default Hyperparameters and Automatically Generated Splits
+
+Use this option to train the models with the saved hyperparameter configurations. If no split manifest is provided, the pipeline automatically generates gene-grouped splits.
 
 ```bash
 python train.py \
   --config new_training_inputs.json \
-  --out-dir results/my_run
+  --out-dir results/my_run \
+  --seed 42
 ```
 
-**Case 2: Use supplied splits:**
+#### Case 2: Train with a Supplied Split Manifest
 
-Add a matching manifest to the configuration:
+Use this option to train the models with predefined training, validation, and test splits instead of generating new ones. Refer to [`training_data/splits.csv.gz`](training_data/splits.csv.gz) for an example of the required split manifest format.
+
+Specify the split manifest in your configuration file:
 
 ```json
 {
@@ -211,21 +217,33 @@ Add a matching manifest to the configuration:
 }
 ```
 
-Run the same training command used in Case 1.
+Then run:
 
-**Case 3: To generate new grouped splits and perform hyperparameter tuning:**
+```bash
+python train.py \
+  --config new_training_inputs.json \
+  --out-dir results/my_run
+```
+
+The pipeline preserves the supplied split assignments.
+
+#### Case 3: Train with Newly Generated Splits and Hyperparameter Tuning
+
+Use this option to generate new gene-grouped splits and perform hyperparameter tuning instead of relying on the saved hyperparameter configurations.
 
 ```bash
 python train.py \
   --config new_training_inputs.json \
   --out-dir results/my_tuned_run \
   --generate-splits \
-  --tune
+  --tune \
+  --seed 42
 ```
-
-The training pipeline produces cleaned data, model checkpoints, out-of-fold predictions, final model weights, test predictions, evaluation metrics and provenance records.
+The `--generate-splits` flag forces the creation of new splits, even if a split manifest is specified in the configuration. The `--tune` flag enables hyperparameter tuning.
 
 Each output directory must be new and must not already exist.
+
+Newly generated split assignments are saved as `splits.csv.gz` in the output directory.
 
 ### 3.3 Use Newly Trained Models
 

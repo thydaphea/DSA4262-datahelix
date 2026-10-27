@@ -521,7 +521,7 @@ def fit_model_with_validation(name, frame, output, seed, config, validation_fram
 
 def ensemble_fit(oof, out):
     """Fit the logistic ensemble on folds 1–4 and validate on held-out fold 5."""
-    target = out/'models/ensemble/oof_holdout'
+    target = out/'models/ensemble'
     target.mkdir(parents=True)
     tr = oof.loc[oof.fold.ne(5)]
     x, y = tr[SCORE_COLUMNS].to_numpy(),tr.label.to_numpy()

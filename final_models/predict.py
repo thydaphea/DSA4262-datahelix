@@ -306,7 +306,7 @@ def load_models(model_dir, method):
             else:
                 result[name] = artifact['model']
     if method == 'ensemble':
-        result['ensemble'] = joblib.load(root / 'ensemble/oof_holdout/logistic_regression.joblib')
+        result['ensemble'] = joblib.load(root / 'ensemble/logistic_regression.joblib')
         if result['ensemble']['feature_order'] != SCORE_COLUMNS:
             raise ValueError('Ensemble feature order mismatch')
     return result
