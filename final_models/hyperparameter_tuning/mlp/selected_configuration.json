@@ -1,5 +1,5 @@
 {
-  "source": "metrics.json:model_selection",
+  "source": "Historical metrics.json:model_selection (redundant source removed from this archive)",
   "metric": "pooled_validation_pr_auc",
   "best_score": 0.492715028631486,
   "best_epoch": 16,
@@ -25,5 +25,9 @@
     12
   ],
   "screen_epochs": 4,
-  "matches_current_final_configuration": true
+  "matches_current_final_configuration": true,
+  "supporting_evidence": [
+    "tuning_history.json",
+    "search_summary.csv"
+  ]
 }

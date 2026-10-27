@@ -1,6 +1,6 @@
-# DataHelix: m6A site prediction
+# Ensemble Machine Learning for the Prediction of m6A RNA Modifications from Direct RNA Sequencing Data
 
-This project predicts RNA N6-methyladenosine (m6A) modification sites using m6Anet-processed nanopore direct RNA sequencing data. The pipeline includes three base models—Gradient Boosting (GB), Multilayer Perceptron (MLP), and Gated Recurrent Unit (GRU)—and a logistic regression stacking ensemble, which is selected as our final model.
+This project predicts RNA N6-methyladenosine (m6A) modification sites using m6Anet-processed nanopore direct RNA sequencing data. The pipeline incorporates three base models—Gradient Boosting (GB), Multilayer Perceptron (MLP), and Gated Recurrent Unit (GRU)—and a logistic regression stacking ensemble, which serves as the final prediction model.
 
 - **`train.py`**: Performs data cleaning, label matching, preserve supplied splits or generate gene-grouped splits, optionally tune hyperparameters, generate five-fold out-of-fold (OOF) predictions, fit final models and the logistic ensemble, and evaluate held-out sites.
 - **`predict.py`**: Generates site-level m6A probabilities from unlabelled signal data using pretrained or newly trained models.
@@ -35,11 +35,8 @@ Launch an Ubuntu instance on AWS Ronin and connect via SSH.
 **System requirements:**
 
 - Operating system: 64-bit x86 Ubuntu 22.04/24.04
-
 - Python: 3.11, configured in a virtual environment
-
 - Hardware: CPU only; no GPU required
-
 - Internet access for installing dependencies
 
 For full-data training, a suggested starting allocation is 2 vCPUs, 8 GB RAM and 5 GB available disk space. These are planning estimates rather than verified minimum requirements.
@@ -76,6 +73,7 @@ The outputs are saved as:
 
 - `example_results/test_sample_predictions.csv`: Predicted m6A probabilities
 - `example_results/test_sample_predictions.audit.json`: Data cleaning and processing audit
+
 Use `--model-dir PATH` to select another training run's weights.
 
 ## 2. Predicting Other Datasets
@@ -109,6 +107,8 @@ python predict.py \
   --output predictions/new_logistic.csv
 ```
 This command uses the pretrained logistic regression ensemble model in the default `models/` directory.
+
+Saved model files are `models/gb/model.joblib` (GB), `models/mlp/model.joblib` (MLP), and `models/gru/model.pt` (GRU, with `preprocessing.json` alongside it). Logistic Regression ensemble settings are saved in `models/ensemble/logistic_regression.joblib`. 
 
 To use models from a separate training run, specify the model directory using `--model-dir`:
 

@@ -1,6 +1,0 @@
-{
-  "epochs_run": 32,
-  "selected_epoch": 32,
-  "stop_reason": "epoch_limit",
-  "pos_weight": 1.0
-}

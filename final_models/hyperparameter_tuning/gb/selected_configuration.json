@@ -1,5 +1,5 @@
 {
-  "source": "metrics.json:model_selection",
+  "source": "Historical metrics.json:model_selection (redundant source removed from this archive)",
   "metric": "pooled_validation_pr_auc",
   "best_score": 0.47953934348545446,
   "best_params": {
@@ -11,5 +11,9 @@
   },
   "best_candidate": 9,
   "candidate_count": 32,
-  "matches_current_final_configuration": true
+  "matches_current_final_configuration": true,
+  "supporting_evidence": [
+    "validation_history.json",
+    "search_summary.csv"
+  ]
 }
