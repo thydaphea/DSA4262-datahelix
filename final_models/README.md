@@ -44,7 +44,7 @@ For full-data training, a suggested starting allocation is 2 vCPUs, 8 GB RAM and
 ### Step 2: Clone the repository, install the pinned dependencies in a Python 3.11 virtual environment.
 
 ```bash
-git clone https://github.com/thydaphea/DSA4262-datahelix.git
+git clone --branch final https://github.com/thydaphea/DSA4262-datahelix.git
 cd DSA4262-datahelix/final_models
 
 python3.11 -m venv .venv
