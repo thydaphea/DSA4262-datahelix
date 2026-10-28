@@ -329,14 +329,14 @@ If you use our models or ideas in your research or projects, please cite:
 
 **APA-style citation:**
 
-Sokun, T., Tan, E. S., Tan, J. W., & Tan, X. Y. (2026). *DataHelix: m6A Site Prediction* [Computer software]. https://github.com/thydaphea/DSA4262-datahelix
+Sokun, T., Tan, E. S., Tan, J. W., & Tan, X. Y. (2026). *Ensemble Machine Learning for the Prediction of m6A RNA Modifications from Direct RNA Sequencing Data* [Computer software]. https://github.com/thydaphea/DSA4262-datahelix
 
 **BibTeX:**
 
 ```bibtex
 @software{datahelix2026,
   author = {Sokun, Thydaphea and Tan, Eng Shuen and Tan, Jia Wei and Tan, Xin Yu},
-  title = {DataHelix: m6A Site Prediction},
+  title = {Ensemble Machine Learning for the Prediction of m6A RNA Modifications from Direct RNA Sequencing Data},
   year = {2026},
   url = {https://github.com/thydaphea/DSA4262-datahelix}
 }
