@@ -1,0 +1,7 @@
+dataset_id,partition,rows,positives,groups,negatives
+dataset0,train,78303,3518,2471,74785
+dataset0,validation,19576,880,611,18696
+dataset1,train,58705,4272,2263,54433
+dataset1,validation,14675,1067,568,13608
+dataset2,train,812,696,116,116
+dataset2,validation,203,174,29,29

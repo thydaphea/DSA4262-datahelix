@@ -1,0 +1,108 @@
+{
+  "status": "COMPLETE",
+  "started_at": "2026-10-17T09:55:06.061164+00:00",
+  "inputs": [
+    {
+      "path": "output/oof/gru/oof_predictions_combined.csv",
+      "sha256": "510641271063784da311fd9cc4fe7b9a29ad1396092454352b9788b34d993daa",
+      "rows": 172274
+    },
+    {
+      "path": "output/oof/mlp/oof_predictions.csv.gz",
+      "sha256": "44640757ac23f7e29cbea349fce47eb7b23f6f4a81fce3fbcd76d54cfe1a71b5",
+      "rows": 172274
+    },
+    {
+      "path": "output/oof/gb/oof_predictions.csv.gz",
+      "sha256": "c036edd28b3b982f87e2bb52a5b06c8eb929f7529fa5627ab5cbeaad9c75d74c",
+      "rows": 172274
+    },
+    {
+      "path": "dataset/cleaned/gru/fold_assignments.csv.gz",
+      "sha256": "7fc6af1da96daa75e5b87afd75631197b9aa42f020380a8dac6be1f94acbc45d",
+      "rows": 172274
+    }
+  ],
+  "training_folds": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "validation_fold": 5,
+  "n_train": 137820,
+  "n_validation": 34454,
+  "features": [
+    "gru_score",
+    "mlp_score",
+    "gb_score"
+  ],
+  "selection_objective": "Mean trapezoidal PR AUC over training folds 1-4; mean ROC AUC breaks ties. No validation-fold selection.",
+  "model_scope": "One pooled model per ensemble, evaluated per dataset and pooled. Label is the target only.",
+  "sklearn_version": "1.9.1",
+  "final_test_evaluated": false,
+  "caveat": "Existing OOF meta-validation is not nested or fully independent: training OOF base models may have learned from outer-validation rows, and historical base-model hyperparameters were selected on the merged population. Final confirmation requires separate test data.",
+  "finished_at": "2026-10-17T09:56:00.182394+00:00",
+  "weighted_candidates": 316,
+  "logistic_candidates": 42,
+  "logistic_cv_fits": 168,
+  "logistic_failed_candidates": 0,
+  "selection": {
+    "weighted_average": {
+      "feature_order": [
+        "gru_score",
+        "mlp_score",
+        "gb_score"
+      ],
+      "weights": [
+        0.44,
+        0.4,
+        0.16
+      ],
+      "constraint": "nonnegative weights summing to 1",
+      "training_folds": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "selection": {
+        "candidate": 264,
+        "stage": "local_0.01",
+        "gru_score": 0.44,
+        "mlp_score": 0.4,
+        "gb_score": 0.16,
+        "mean_cv_roc_auc": 0.8869308063801972,
+        "mean_cv_pr_auc_trapezoidal": 0.5090575872263914,
+        "mean_cv_average_precision": 0.509194969935484,
+        "fold_pr_auc": "[0.5168704843382104, 0.505549895255215, 0.5084598547958609, 0.5053501145162793]"
+      }
+    },
+    "logistic_regression": {
+      "config": {
+        "representation": "raw_logit",
+        "C": 0.01,
+        "class_weight": null
+      },
+      "selection": {
+        "candidate": 32,
+        "representation": "raw_logit",
+        "C": 0.01,
+        "class_weight": null,
+        "status": "OK",
+        "mean_cv_roc_auc": 0.8875361146805177,
+        "mean_cv_pr_auc_trapezoidal": 0.5093882892295685,
+        "mean_cv_average_precision": 0.5095254204139312,
+        "fold_pr_auc": "[0.5156477298571809, 0.5056833864182791, 0.5100761864917895, 0.5061458541510246]"
+      },
+      "iterations": 36
+    }
+  },
+  "artifacts": {
+    "logistic_regression.joblib": "8e5a6049fb579a73ecdd9568ac7c6dd8c3d321d4cd44d468ea12d99bbd0a9269",
+    "selection.json": "134feecb48566020c9fecc3d2b8f43547040ecbda028734fbbfb75a815602e00",
+    "logistic_regression_coefficients.csv": "22716c3dd83b3c1945136dc4d0acc0e7bd60049e24a0f49be10380c33868d94b",
+    "weighted_average.json": "95dbfed4d498e9d007baf8db864b4028d2c03fd386c40e1da0e0a71cfcb48eb9",
+    "logistic_regression_intercept.json": "c3ab028b7ef00bf37d6d645a5bed169a380ba33fcb0567acddde498ad9cfb847"
+  }
+}

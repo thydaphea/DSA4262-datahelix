@@ -1,0 +1,76 @@
+{
+  "selection_metric": "pooled_validation_pr_auc",
+  "selected_dropout": 0.2,
+  "configurations": [
+    {
+      "dropout": 0.5,
+      "validation_pr_auc": 0.492715028631486,
+      "best_epoch": 16,
+      "model_path": "/home/ubuntu/project/results/mlp/model.joblib",
+      "model_sha256": "8c31c5715b620e26bd775018e54b3d537ed66c426cc69c3bd9f4626390501385",
+      "baseline_reused": true
+    },
+    {
+      "dropout": 0.0,
+      "validation_pr_auc": 0.4919859598680937,
+      "best_epoch": 7,
+      "model_path": "/home/ubuntu/project/results/mlp_dropout_comparison/dropout_0/model.joblib",
+      "model_sha256": "57cd05cdb8712014577486f588de7236e211061dff17edd3ad007bdeba0a1716",
+      "baseline_reused": false
+    },
+    {
+      "dropout": 0.1,
+      "validation_pr_auc": 0.4926203289615414,
+      "best_epoch": 11,
+      "model_path": "/home/ubuntu/project/results/mlp_dropout_comparison/dropout_0.1/model.joblib",
+      "model_sha256": "fb025756cb11063b0ddc1b202c70fcebcd9a9b0872cdbf1ea1359dd69c8b08d6",
+      "baseline_reused": false
+    },
+    {
+      "dropout": 0.2,
+      "validation_pr_auc": 0.49822261210846075,
+      "best_epoch": 16,
+      "model_path": "/home/ubuntu/project/results/mlp_dropout_comparison/dropout_0.2/model.joblib",
+      "model_sha256": "65905c1990f23b46c1a2a2869196b805fd10c11e142cb543ff7ce1516f874b88",
+      "baseline_reused": false
+    },
+    {
+      "dropout": 0.3,
+      "validation_pr_auc": 0.4923832757617034,
+      "best_epoch": 12,
+      "model_path": "/home/ubuntu/project/results/mlp_dropout_comparison/dropout_0.3/model.joblib",
+      "model_sha256": "50e600eb69da1fcf3e27cca3f185f46d685c63080bc8fd05fb57fc13f372a6ec",
+      "baseline_reused": false
+    }
+  ],
+  "fixed_parameters": {
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001,
+    "batch_size": 256,
+    "class_weight": "none"
+  },
+  "baseline_network_config": {
+    "hidden": [
+      256,
+      128
+    ],
+    "dropout": 0.5
+  },
+  "varied_parameter": "dropout",
+  "fixed_hidden_layers": [
+    256,
+    128
+  ],
+  "seed": 42,
+  "epochs": 30,
+  "patience": 6,
+  "threads": 1,
+  "baseline_model_sha256": "8c31c5715b620e26bd775018e54b3d537ed66c426cc69c3bd9f4626390501385",
+  "manifest_sha256": "057ecc094f84a412b642e803a9636ee3da1e1b03ca9b2b1375c034ee2bc7baac",
+  "note": "Only dropout varies. The saved baseline is reused. All validation/test metrics are unweighted. Original models are unchanged.",
+  "limitations": [
+    "One random seed; differences do not establish statistical significance.",
+    "The test set has been inspected previously; results are exploratory.",
+    "Checkpoints are selected independently with the same early-stopping rule; epochs can differ."
+  ]
+}

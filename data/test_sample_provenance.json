@@ -1,0 +1,22 @@
+{
+  "purpose": "Unlabeled example input for predict.py; not an accuracy benchmark.",
+  "site_count": 300,
+  "sites_per_dataset": {
+    "dataset0": 100,
+    "dataset1": 100,
+    "dataset2": 100
+  },
+  "source_split": "held-out test assignments in final_models/splits.csv.gz",
+  "selection": {
+    "method": "deterministic random samples without replacement within each dataset test partition; duplicate transcript/position identities across datasets excluded",
+    "seed": 4262
+  },
+  "labels_included": false,
+  "raw_sources": {
+    "dataset0": "dataset/data0/dataset0_json/dataset0.json",
+    "dataset1": "dataset/data1/dataset1_json/dataset1.json",
+    "dataset2": "dataset/data2/dataset2.json.gz"
+  },
+  "split_manifest_sha256": "57691d58f4072441dfab28fdf4264d3bc913d5d6e3bf5e88aa9d7b544ead4560",
+  "sample_sha256": "588b16164a609d686332a0c7564f5f300e55e2d5182ed2978329f4b3bd432408"
+}
