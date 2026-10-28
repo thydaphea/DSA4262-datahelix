@@ -34,25 +34,60 @@ Launch an Ubuntu instance on AWS Ronin and connect via SSH.
 
 **System requirements:**
 
-- Operating system: 64-bit x86 Ubuntu 22.04/24.04
-- Python: 3.11, configured in a virtual environment
-- Hardware: CPU only; no GPU required
-- Internet access for installing dependencies
+- **Operating system:** 64-bit x86 Linux (tested on Ubuntu Server 26.04 LTS)
+- **Python:** 3.11, installed using `uv` and configured in a virtual environment
+- **Hardware:** CPU only; no GPU required
+- **Internet access:** Required for installing Python and project dependencies
 
-For full-data training, a suggested starting allocation is 2 vCPUs, 8 GB RAM and 5 GB available disk space. These are planning estimates rather than verified minimum requirements.
+**Recommended resources for full-data training:**
 
-### Step 2: Clone the repository, install the pinned dependencies in a Python 3.11 virtual environment.
+- CPU: 2 vCPUs
+- Memory: 8 GB RAM
+- Disk space: 5 GB available storage (estimated)
+
+These are suggested starting allocations rather than verified minimum requirements.
+
+**Tested environment:** DataHelix was developed on Ubuntu Server 26.04 LTS with a 64 GB root volume. The root volume size reflects the development environment and is not a minimum software requirement.
+
+### Step 2: Clone the Repository and Set Up the Environment
+
+Install Python 3.11 using `uv`, without changing Ubuntu’s system Python.
 
 ```bash
+# Install prerequisites
+sudo apt-get update
+sudo apt-get install -y git curl ca-certificates
+
+# Install uv
+curl -LsSf https://astral.sh/uv/install.sh -o /tmp/uv-install.sh
+sh /tmp/uv-install.sh
+export PATH="$HOME/.local/bin:$PATH"
+
+# Clone the repository
 git clone --branch final https://github.com/thydaphea/DSA4262-datahelix.git
 cd DSA4262-datahelix/final_models
 
-python3.11 -m venv .venv
+# Install Python and create the environment
+uv python install 3.11
+uv venv --python 3.11 --seed .venv
 source .venv/bin/activate
 
+# Install the pinned dependencies
 python -m pip install --upgrade pip
 python -m pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/cpu
 python -m pip install -r requirements.txt
+
+# Verify the installation
+python --version
+python -m pip check
+```
+
+The Python version should be `3.11.x`, and `pip check` should report no broken requirements.
+
+In each new terminal session, enter the package directory and activate the environment before running training or prediction:
+
+```bash
+source .venv/bin/activate
 ```
 ### Step 3: Run Predictions on the Sample Dataset
 
