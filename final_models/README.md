@@ -47,7 +47,7 @@ Launch an Ubuntu instance on AWS Ronin and connect via SSH.
 
 These are suggested starting allocations rather than verified minimum requirements.
 
-**Tested environment:** DataHelix was developed on Ubuntu Server 26.04 LTS with a 64 GB root volume. The root volume size reflects the development environment and is not a minimum software requirement.
+**Tested environment:** This project was developed on Ubuntu Server 26.04 LTS with a 64 GB root volume. The root volume size reflects the development environment and is not a minimum software requirement.
 
 ### Step 2: Clone the Repository and Set Up the Environment
 
