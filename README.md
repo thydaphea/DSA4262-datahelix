@@ -24,7 +24,6 @@ This project predicts RNA N6-methyladenosine (m6A) modification sites using m6An
 6. [Troubleshooting](#6-troubleshooting)
 7. [License and Citation](#7-license-and-citation)
 
-The `main` branch contains the package directly at the repository root. The `final` branch retains the original `final_models/` layout as a backup.
 
 ## 1. Quick Start: Predict on the Sample Test Dataset
 
